@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="bg">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Онлайн калкулатор за смесени плащания и ресто</title>
+    <meta name="description"
+        content="Онлайн калкулатор за превалутиране между BGN и EUR по фиксиран курс 1.95583. Изчислява комбинирано ресто и плащания в левове и евро за стоки или услуги.">
+    <!--  TO DO: FIX TAGS 
+
+        Meta tags
+        <meta name="author" content="SevtWare &trade;">
+        <meta name="robots" content="index, follow">
+        <link rel="canonical" href="https://diel.bg/bg/">
+        <link rel="alternate" hreflang="bg" href="https://diel.bg/bg">
+        <link rel="alternate" hreflang="en" href="https://diel.bg/en">
+        <meta name="keywords" content="калкулатор, ковертор, превалутиране, ресто, лев, евро, lev, evro, euro, BGN, EUR">
+
+        Open Graph Meta Tags
+            <meta property="og:site_name" content="ДИЕЛ-Палазов ООД">
+            <meta property="og:title" content="Начало | ДИЕЛ-Палазов ООД - онлайн магазин за осветление, електроматериали и електроапаратура">
+            <meta property="og:description" content="Добре дошли в ДИЕЛ-Палазов ООД, вашият надежден доставчик на осветителни тела, електроматериали и електроинсталационни услуги. Пазарувайте онлайн с нас.">
+            <meta property="og:image" content="https://diel.bg/storage/images/diel-meta-image.jpg">
+            <meta property="og:url" content="https://diel.bg/bg">
+            <meta property="og:type" content="website">
+
+        Twitter Card Data
+            <meta name="twitter:card" content="summary_large_image">
+            <meta name="twitter:title" content="Начало | ДИЕЛ-Палазов ООД - онлайн магазин за осветление, електроматериали и електроапаратура">
+            <meta name="twitter:description" content="Добре дошли в ДИЕЛ-Палазов ООД, вашият надежден доставчик на осветителни тела, електроматериали и електроинсталационни услуги. Пазарувайте онлайн с нас.">
+            <meta name="twitter:image" content="https://diel.bg/storage/images/diel-meta-image.jpg">
+
+        -->
+    <link rel="icon" type="image/x-icon" href="./assets/logo.png">
+    <link href="./styles.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body class="min-h-screen p-6 bg-slate-700 text-white dark:bg-gray-100 dark:text-gray-800">
+    <!-- THEME SWITCH TOGGLE -->
+    <button id="themeToggle"
+        class="relative w-16 h-8 rounded-full flex items-center px-1 text-amber-500 bg-slate-400 dark:bg-gray-400 transition-colors duration-300">
+        <!-- Moon icon -->
+        <i class="fa-solid fa-moon text-amber-800 text-lg absolute left-2
+              opacity-50 dark:opacity-100 transition-opacity duration-300"></i>
+        <!-- Sun icon -->
+        <i class="fa-solid fa-sun text-yellow-300 text-lg absolute right-2 z-1
+              transition-opacity duration-300 
+              dark:opacity-0"></i>
+
+
+
+        <!-- Sliding knob -->
+        <span class="absolute w-6 h-6 bg-white dark:bg-gray-800 rounded-full
+                 transform transition-transform duration-300
+                 translate-x-0 dark:translate-x-8">
+        </span>
+    </button>
+
+    <div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- LEFT: Calculator Buttons -->
+        <div class="p-6 rounded-2xl bg-slate-800 dark:bg-gray-200">
+
+            <!-- Display -->
+            <div
+                class="mb-6 p-6 rounded-xl text-right text-4xl font-bold bg-slate-900 text-white dark:bg-gray-100 dark:text-gray-800">
+                0
+            </div>
+
+            <!-- Buttons Grid -->
+            <div class="grid grid-cols-4 gap-4 text-lg font-semibold">
+
+                <!-- Row 1 -->
+                <button class="rounded-xl text-2xl font-semibold leading-none px-4 py-3 
+        bg-stone-200 text-gray-700 border-b-4 border-b-stone-400
+        active:translate-y-[2px] active:border-b-0
+        dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">7</button>
+
+                <button class="rounded-xl text-2xl font-semibold leading-none px-4 py-3 
+        bg-stone-200 text-gray-700 border-b-4 border-b-stone-400
+        active:translate-y-[2px] active:border-b-0
+        dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">8</button>
+
+                <button class="rounded-xl text-2xl font-semibold leading-none px-4 py-3 
+        bg-stone-200 text-gray-700 border-b-4 border-b-stone-400
+        active:translate-y-[2px] active:border-b-0
+        dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">9</button>
+
+                <button class="rounded-xl text-2xl font-semibold leading-none px-4 py-3 
+        text-white bg-indigo-400 border-b-4 border-b-indigo-600
+        active:translate-y-[2px] active:border-b-0
+        dark:bg-cyan-600 dark:border-b-cyan-800">DEL</button>
+
+                <!-- Row 2 -->
+                <button class="rounded-xl text-2xl font-semibold leading-none px-4 py-3 
+        bg-stone-200 text-gray-700 border-b-4 border-b-stone-400
+        active:translate-y-[2px] active:border-b-0
+        dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">4</button>
+
+                <button class="rounded-xl text-2xl font-semibold leading-none px-4 py-3 
+        bg-stone-200 text-gray-700 border-b-4 border-b-stone-400
+        active:translate-y-[2px] active:border-b-0
+        dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">5</button>
+
+                <button class="rounded-xl text-2xl font-semibold leading-none px-4 py-3 
+        bg-stone-200 text-gray-700 border-b-4 border-b-stone-400
+        active:translate-y-[2px] active:border-b-0
+        dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">6</button>
+
+                <button class="rounded-xl text-2xl font-semibold leading-none px-4 py-3 
+        text-white bg-indigo-400 border-b-4 border-b-indigo-600
+        active:translate-y-[2px] active:border-b-0
+        dark:bg-cyan-600 dark:border-b-cyan-800">+</button>
+
+                <!-- Row 3 -->
+                <button class="rounded-xl text-2xl font-semibold leading-none px-4 py-3 
+        bg-stone-200 text-gray-700 border-b-4 border-b-stone-400
+        active:translate-y-[2px] active:border-b-0
+        dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">1</button>
+
+                <button class="rounded-xl text-2xl font-semibold leading-none px-4 py-3 
+        bg-stone-200 text-gray-700 border-b-4 border-b-stone-400
+        active:translate-y-[2px] active:border-b-0
+        dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">2</button>
+
+                <button class="rounded-xl text-2xl font-semibold leading-none px-4 py-3 
+        bg-stone-200 text-gray-700 border-b-4 border-b-stone-400
+        active:translate-y-[2px] active:border-b-0
+        dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">3</button>
+
+                <button class="rounded-xl text-2xl font-semibold leading-none px-4 py-3 
+        text-white bg-indigo-400 border-b-4 border-b-indigo-600
+        active:translate-y-[2px] active:border-b-0
+        dark:bg-cyan-600 dark:border-b-cyan-800">-</button>
+
+                <!-- Row 4 -->
+                <button class="rounded-xl text-2xl font-semibold leading-none px-4 py-3 
+        bg-stone-200 text-gray-700 border-b-4 border-b-stone-400
+        active:translate-y-[2px] active:border-b-0
+        dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">.</button>
+
+                <button class="rounded-xl text-2xl font-semibold leading-none px-4 py-3 
+        bg-stone-200 text-gray-700 border-b-4 border-b-stone-400
+        active:translate-y-[2px] active:border-b-0
+        dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">0</button>
+
+                <button class="rounded-xl text-2xl font-semibold leading-none px-4 py-3 
+        bg-stone-200 text-gray-700 border-b-4 border-b-stone-400
+        active:translate-y-[2px] active:border-b-0
+        dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">/</button>
+
+                <button class="rounded-xl text-2xl font-semibold leading-none px-4 py-3 
+        text-white bg-indigo-400 border-b-4 border-b-indigo-600
+        active:translate-y-[2px] active:border-b-0
+        dark:bg-cyan-600 dark:border-b-cyan-800">×</button>
+
+                <!-- RESET -->
+                <button class="col-span-2 rounded-xl text-2xl font-semibold leading-none px-4 py-3 
+        text-white bg-indigo-400 border-b-4 border-b-indigo-600
+        active:translate-y-[2px] active:border-b-0
+        dark:bg-cyan-600 dark:border-b-cyan-800">RESET</button>
+
+                <!-- EQUAL -->
+                <button class="col-span-2 rounded-xl text-2xl font-semibold leading-none px-4 py-3 
+        text-white bg-red-500 border-b-4 border-b-red-700
+        active:translate-y-[2px] active:border-b-0
+        dark:bg-orange-600 dark:border-b-orange-800">=</button>
+
+            </div>
+
+        </div>
+
+        <!-- MIDDLE: Display Panel -->
+        <div
+            class="p-6 rounded-2xl flex flex-col justify-between bg-slate-800 text-white dark:bg-gray-200 dark:text-gray-800">
+            <div class="opacity-70 text-lg">Expression:</div>
+            <div class="text-5xl font-bold text-right">0</div>
+        </div>
+
+        <!-- RIGHT INFO PANEL -->
+        <div class="p-6 rounded-2xl flex flex-col gap-4 bg-slate-800 text-white dark:bg-gray-200 dark:text-gray-800">
+            <h2 class="text-3xl font-bold">Калкулатор за смесено плащане и ресто</h2>
+            <p>
+                Калкулаторът изчислява нужните суми за комбинирано плащане или ресто.
+            </p>
+        </div>
+
+    </div>
+
+    <script src="./scripts.js"></script>
+</body>
+
+</html>
