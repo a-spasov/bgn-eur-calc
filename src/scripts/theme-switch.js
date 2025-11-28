@@ -1,4 +1,4 @@
-function themeSwitch() {
+function initThemeSwitch() {
     document.getElementById("themeToggle").addEventListener("click", () => {
         const html = document.documentElement;
         html.classList.toggle("dark");
@@ -16,5 +16,5 @@ function themeSwitch() {
 
 }
 
-export {themeSwitch};
+export {initThemeSwitch};
 

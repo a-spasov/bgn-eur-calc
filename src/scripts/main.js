@@ -1,3 +1,11 @@
-import {themeSwitch} from './theme-switch.js';
+import {initThemeSwitch} from './theme-switch.js';
+import {
+    initModeSwitch,
+    calcKeypadToggle,
+} from './calc-buttons.js';
 
-themeSwitch();
+document.addEventListener("DOMContentLoaded", () => {
+    initThemeSwitch();
+    initModeSwitch();
+    calcKeypadToggle();
+});
