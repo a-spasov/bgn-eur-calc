@@ -41,34 +41,55 @@
     <main class="w-2/3 p-6 inline-flex items-center justify-center">
         <!-- CALCULATOR -->
         <div>
-            <!-- MODE SWITCH -->
-            <div class="flex items-center justify-end gap-3 mb-4">
-                <span class="font-bold text-xs text-yellow-300 tracking-widest uppercase">Режим:</span>
-                <div id="modeWrapper" class="relative flex rounded-md bg-slate-900 dark:bg-gray-300 p-1 select-none">
-                    <div id="modeSlider"
-                        class="absolute top-1 left-1 h-5 w-[130px] rounded-sm bg-orange-500 transition-all duration-300 ease-out">
+            <!-- TOP CONTROL PANEL -->
+            <div class="flex justify-between mb-4">
+                <!-- MODE SWITCH -->
+                <div class="flex items-center justify-end gap-3">
+                    <!-- <span class="font-bold text-xs text-yellow-300 tracking-widest uppercase">Режим:</span> -->
+                    <div id="modeWrapper" class="relative flex rounded-md bg-slate-900 dark:bg-gray-300 p-1 select-none">
+                        <div id="modeSlider"
+                            class="absolute top-1 left-1 h-5 w-[130px] rounded-sm bg-orange-500 transition-all duration-300 ease-out">
+                        </div>
+                        <button id="modePayment"
+                            class="relative z-10 text-sm font-bold w-[130px] tracking-wider dark:text-gray-900">
+                            Плащане
+                        </button>
+                        <button id="modeChange"
+                            class="relative z-10 text-sm font-bold w-[130px] tracking-wider dark:text-gray-900">
+                            Ресто
+                        </button>
                     </div>
-                    <button id="modePayment"
-                        class="relative z-10 text-sm font-semibold w-[130px] tracking-wider dark:text-gray-900">
-                        Плащане
+                </div>
+
+                <div>
+                    <!-- KEYPAD TOGGLE BUTTON -->
+                    <button id="toggleNumpad" class="rounded-lg text-base font-bold px-3 py-0 mr-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">
+                        <i class="fa-solid fa-keyboard"></i>
                     </button>
-                    <button id="modeChange"
-                        class="relative z-10 text-sm font-semibold w-[130px] tracking-wider dark:text-gray-900">
-                        Ресто
+
+                    <!-- RESET CALCULATOR -->
+                    <button class="rounded-lg text-base font-bold px-3 py-0 text-white bg-red-500 border-b-4 border-b-red-700 active:translate-y-[2px] active:border-b-0">
+                        <i class="fa-solid fa-rotate-left"></i> 
                     </button>
                 </div>
             </div>
 
+            <!-- DISPLAY -->
+            <div id="calcDisplay" class="flex flex-col mb-8 px-5 py-4 rounded-lg text-right text-5xl font-bold bg-slate-900 text-white dark:bg-gray-300 dark:text-gray-800">
+                <div id="messageLine" class=" transform transition-all duration-500 ease-in-expo text-yellow-300 text-sm text-left">Моля, въведете сума в евро или лв.</div>
+                <div id="resultsLine">0.00</div>
+            </div>
+
             <!-- INPUTS PANEL -->
-            <div class="grid grid-cols-1 gap-6 text-left mb-4">
+            <div id="calcInputs" class="grid grid-cols-1 gap-6 text-left mb-8">
 
                 <!-- ROW 1 -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div id="priceInputs" class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                     <div class="relative">
-                        <input id="priceEur" type="text" step="0.01" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
+                        <input id="priceEur" type="text" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
                             border border-gray-500 rounded-md outline-none
-                            focus:border-orange-400 placeholder-transparent" placeholder="Цена в евро (€)">
+                            focus:border-orange-400 disabled:opacity-50 placeholder-transparent" placeholder="Цена в евро (€)">
                         <label for="priceEur" class="absolute left-3 -top-2.5 px-1 bg-slate-700 dark:bg-gray-100
                             text-sm text-gray-300 dark:text-gray-700
                             transition-all peer-placeholder-shown:top-3
@@ -76,12 +97,13 @@
                             peer-focus:-top-2.5 peer-focus:text-sm">
                             Цена в евро (€)
                         </label>
+                        <div class="absolute -right-5 top-1/2 -translate-y-1/2 opacity-80 text-2xl font-bold">=</div>
                     </div>
 
                     <div class="relative">
-                        <input id="priceBgn" type="text" step="0.01" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
+                        <input id="priceBgn" type="text" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
                             border border-gray-500 rounded-md outline-none
-                            focus:border-orange-400 placeholder-transparent" placeholder="Цена в лева">
+                            focus:border-orange-400 disabled:opacity-50 placeholder-transparent" placeholder="Цена в лева">
                         <label for="priceBgn" class="absolute left-3 -top-2.5 px-1 bg-slate-700 dark:bg-gray-100
                             text-sm text-gray-300 dark:text-gray-700
                             transition-all peer-placeholder-shown:top-3
@@ -94,10 +116,10 @@
                 </div>
 
                 <!-- ROW 2 -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div id="paymentInputs" class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                     <div class="relative">
-                        <input id="paidEur" type="text" step="0.01" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
+                        <input id="paidEur" type="text" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
                             border border-gray-500 rounded-md outline-none
                             focus:border-orange-400 placeholder-transparent" placeholder="Платено в евро (€)">
                         <label for="paidEur" class="absolute left-3 -top-2.5 px-1 bg-slate-700 dark:bg-gray-100
@@ -110,7 +132,7 @@
                     </div>
 
                     <div class="relative">
-                        <input id="paidBgn" type="text" step="0.01" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
+                        <input id="paidBgn" type="text" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
                             border border-gray-500 rounded-md outline-none
                             focus:border-orange-400 placeholder-transparent" placeholder="Платено в лева">
                         <label for="paidBgn" class="absolute left-3 -top-2.5 px-1 bg-slate-700 dark:bg-gray-100
@@ -125,10 +147,10 @@
                 </div>
 
                 <!-- ROW 3 -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div id="changeInputs" class="invisible opacity-0 grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-500 ease-in-expo">
 
                     <div class="relative">
-                        <input id="changeEur" type="text" step="0.01" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
+                        <input id="changeEur" type="text" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
                             border border-gray-500 rounded-md outline-none
                             focus:border-orange-400 placeholder-transparent" placeholder="Ресто в евро (€)">
                         <label for="changeEur" class="absolute left-3 -top-2.5 px-1 bg-slate-700 dark:bg-gray-100
@@ -141,7 +163,7 @@
                     </div>
 
                     <div class="relative">
-                        <input id="changeBgn" type="text" step="0.01" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
+                        <input id="changeBgn" type="text" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
                             border border-gray-500 rounded-md outline-none
                             focus:border-orange-400 placeholder-transparent" placeholder="Ресто в лева">
                         <label for="changeBgn" class="absolute left-3 -top-2.5 px-1 bg-slate-700 dark:bg-gray-100
@@ -157,47 +179,33 @@
 
             </div>
 
-            <!-- DISPLAY -->
-            <div id="calcDisplay"
-                class="relative mb-8 p-6 rounded-lg text-right text-5xl font-bold bg-slate-900 text-white dark:bg-gray-300 dark:text-gray-800">
-                0
-                <!-- KEYPAD TOGGLE BUTTON -->
-                <button id="toggleNumpad" class="absolute flex gap-2 -bottom-6 right-0 w-24 pb-1 pt-2 items-center justify-center rounded-b-lg text-white text-lg dark:text-gray-800 bg-slate-900 dark:bg-gray-300 cursor-pointer transition">
-                    <i class="fa-solid fa-keyboard"></i>
-                    <i id="chevronIcon" class="fa-solid fa-chevron-down fa-xs transition-transform duration-300"></i>
-                </button>
-            </div>
-
-            <!-- FIXED 4x4 GRID -->
+            <!-- KEYBOARD -->
             <div
                 id="numpad"
-                class="grid grid-cols-4 grid-rows-4 gap-4 h-96 text-lg font-semibold mt-auto transition-all duration-300 visible opacity-100 xl:invisible xl:opacity-0">
-                <!-- ROW 1 --> <button
-                    class="rounded-xl text-2xl font-semibold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">7</button>
-                <button
-                    class="rounded-xl text-2xl font-semibold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">8</button>
-                <button
-                    class="rounded-xl text-2xl font-semibold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">9</button>
-                <button
-                    class="row-span-2 rounded-xl text-2xl font-semibold leading-none px-4 py-3 text-white bg-orange-500 border-b-4 border-b-orange-700 active:translate-y-[2px] active:border-b-0">
-                    <i class="fa-solid fa-trash"></i> </button> <!-- ROW 2 --> <button
-                    class="rounded-xl text-2xl font-semibold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">4</button>
-                <button
-                    class="rounded-xl text-2xl font-semibold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">5</button>
-                <button
-                    class="rounded-xl text-2xl font-semibold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">6</button>
-                <!-- ROW 3 --> <button
-                    class="rounded-xl text-2xl font-semibold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">1</button>
-                <button
-                    class="rounded-xl text-2xl font-semibold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">2</button>
-                <button
-                    class="rounded-xl text-2xl font-semibold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">3</button>
-                <button
-                    class="row-span-2 rounded-xl text-2xl font-semibold leading-none px-4 py-3 text-white bg-red-500 border-b-4 border-b-red-700 active:translate-y-[2px] active:border-b-0">
-                    <i class="fa-solid fa-rotate-left"></i> </button> <!-- ROW 4 --> <button
-                    class="col-span-2 rounded-xl text-2xl font-semibold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">
-                    0 </button> <button
-                    class="rounded-xl text-2xl font-semibold leading-[0] px-4 py-3 bg-slate-500 text-white border-b-4 border-b-slate-600 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">.</button>
+                class="relative grid grid-cols-4 grid-rows-4 gap-4 h-96 text-lg font-bold mt-auto transform transition-all duration-500 ease-in-expo visible opacity-100 xl:invisible xl:opacity-0"
+            >
+                <!-- ROW 1 -->
+                <button class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">7</button>
+                <button class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">8</button>
+                <button class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">9</button>
+                <button class="row-span-2 rounded-xl text-2xl font-bold leading-none px-4 py-3 text-white bg-orange-500 border-b-4 border-b-orange-700 active:translate-y-[2px] active:border-b-0">
+                    <i class="fa-solid fa-trash"></i>
+                </button> 
+                <!-- ROW 2 -->
+                <button class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">4</button>
+                <button class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">5</button>
+                <button class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">6</button>
+                <!-- ROW 3 -->
+                <button class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">1</button>
+                <button class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">2</button>
+                <button class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">3</button>
+                <button class="row-span-2 rounded-xl text-2xl font-bold leading-none px-4 py-3 text-white bg-red-500 border-b-4 border-b-red-700 active:translate-y-[2px] active:border-b-0">
+                    <i class="fa-solid fa-rotate-left"></i> 
+                </button>
+                <!-- ROW 4 -->
+                 <button class="col-span-2 rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">
+                    0 </button>
+                <button class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-slate-500 text-white border-b-4 border-b-slate-600 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">.</button>
             </div>
 
         </div>
