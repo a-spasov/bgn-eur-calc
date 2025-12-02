@@ -28,6 +28,31 @@
   });
 
   // src/scripts/calc-buttons.js
+  function updateScreenText() {
+    const checklist = document.getElementById("inputsChecklist");
+    const changeInputs = document.getElementById("changeInputs");
+    const messageText = document.getElementById("messageText");
+    if (!checklist || !changeInputs || !messageText) return;
+    checklist.innerHTML = "";
+    const isPaymentMode = changeInputs.classList.contains("payment-mode");
+    messageText.textContent = isPaymentMode ? "\u0418\u0441\u043A\u0430\u0442\u0435 \u0434\u0430 \u043F\u043B\u0430\u0442\u0438\u0442\u0435 \u0437\u0430 \u0441\u0442\u043E\u043A\u0430/\u0443\u0441\u043B\u0443\u0433\u0430 \u0432 \u0434\u0432\u0435\u0442\u0435 \u0432\u0430\u043B\u0443\u0442\u0438? \u0412\u044A\u0432\u0435\u0434\u0435\u0442\u0435:" : "\u0418\u0441\u043A\u0430\u0442\u0435 \u0434\u0430 \u0438\u0437\u0447\u0438\u0441\u043B\u0438\u0442\u0435 \u0440\u0435\u0441\u0442\u043E \u0432 \u0435\u0432\u0440\u043E \u0438 \u043B\u0432.? \u0412\u044A\u0432\u0435\u0434\u0435\u0442\u0435:";
+    const items = isPaymentMode ? [
+      "- \u043E\u0431\u0449\u0430 \u0446\u0435\u043D\u0430 \u0432 \u0435\u0432\u0440\u043E \u0438\u043B\u0438 \u043B\u0432.",
+      "- \u043F\u043B\u0430\u0442\u0435\u043D\u0430 \u0441\u0443\u043C\u0430 \u0432 \u0435\u0432\u0440\u043E \u0438\u043B\u0438 \u043B\u0432."
+    ] : [
+      "- \u043E\u0431\u0449\u0430 \u0446\u0435\u043D\u0430 \u0432 \u0435\u0432\u0440\u043E \u0438\u043B\u0438 \u043B\u0432.",
+      "- \u043F\u043B\u0430\u0442\u0435\u043D\u0430 \u0441\u0443\u043C\u0430 \u0432 \u0435\u0432\u0440\u043E \u0438/\u0438\u043B\u0438 \u043B\u0432.",
+      "- \u0432\u044A\u0440\u043D\u0430\u0442\u0430 \u0441\u0443\u043C\u0430 \u0432 \u0435\u0432\u0440\u043E \u0438\u043B\u0438 \u043B\u0432. (\u0432\u0430\u0436\u0438 \u0441\u0430\u043C\u043E \u0437\u0430 \u0441\u043C\u0435\u0441\u0435\u043D\u043E \u0440\u0435\u0441\u0442\u043E)"
+    ];
+    let itemCounter = 1;
+    items.forEach((text) => {
+      const li = document.createElement("li");
+      li.textContent = text;
+      li.classList.add(`inputs-line-${itemCounter}`);
+      checklist.appendChild(li);
+      itemCounter++;
+    });
+  }
   function initModeSwitch() {
     const modePayment = document.getElementById("modePayment");
     const modeChange = document.getElementById("modeChange");
@@ -49,6 +74,7 @@
       el.classList.remove(...ACTIVE);
     }
     function activatePaymentMode() {
+      currentMode = "payment";
       const numpad = document.getElementById("numpad");
       const isKeyboardOn = numpad?.classList.contains("keyboard-on");
       modeSlider.style.transform = "translateX(0px)";
@@ -60,8 +86,10 @@
           numpad.style.transform = "translateY(-74px)";
         }, 800);
       }
+      updateScreenText();
     }
     function activateChangeMode() {
+      currentMode = "change";
       const numpad = document.getElementById("numpad");
       const isKeyboardOn = numpad?.classList.contains("keyboard-on");
       modeSlider.style.transform = `translateX(${SLIDE_WIDTH}px)`;
@@ -75,6 +103,7 @@
       } else {
         changeInputs.classList.remove("invisible", "opacity-0", "payment-mode");
       }
+      updateScreenText();
     }
     modePayment.addEventListener("click", activatePaymentMode);
     modeChange.addEventListener("click", activateChangeMode);
@@ -106,12 +135,14 @@
       }
     });
   }
+  var currentMode;
   var init_calc_buttons = __esm({
     "src/scripts/calc-buttons.js"() {
+      currentMode = "payment";
     }
   });
 
-  // src/scripts/calculations.js
+  // src/scripts/data-handling.js
   function autoConvert(inputElemId, value) {
     const val = parseFloat(value);
     if (isNaN(val)) return;
@@ -120,11 +151,13 @@
     switch (inputElemId) {
       case "priceEur":
         priceBgn.value = (val * RATE).toFixed(2);
+        priceBgn.classList.remove("border-red-600", "border-gray-500");
         priceBgn.classList.add("border-lime-600");
         priceBgn.disabled = true;
         break;
       case "priceBgn":
         priceEur.value = (val / RATE).toFixed(2);
+        priceEur.classList.remove("border-red-600", "border-gray-500");
         priceEur.classList.add("border-lime-600");
         priceEur.disabled = true;
         break;
@@ -159,7 +192,18 @@
           new CustomEvent("show-notification", {
             detail: {
               type: "success",
-              message: "\u041C\u043E\u043B\u044F, \u0432\u044A\u0432\u0435\u0434\u0435\u0442\u0435 \u0434\u0430\u043D\u043D\u0438 \u0437\u0430 \u0447\u0430\u0441\u0442\u0438\u0447\u043D\u043E \u043F\u043B\u0430\u0449\u0430\u043D\u0435 \u0432 \u0435\u0432\u0440\u043E \u0438\u043B\u0438 \u043B\u0432."
+              fieldId: el.id
+            }
+          })
+        );
+      } else if (el.value === "") {
+        if (el.closest("#priceInputs") && el.id === "priceBgn") resetInput(document.getElementById("priceEur"));
+        if (el.closest("#priceInputs") && el.id === "priceEur") resetInput(document.getElementById("priceBgn"));
+        document.dispatchEvent(
+          new CustomEvent("show-notification", {
+            detail: {
+              type: "error",
+              fieldId: el.id
             }
           })
         );
@@ -168,7 +212,7 @@
           new CustomEvent("show-notification", {
             detail: {
               type: "error",
-              message: "\u041C\u043E\u043B\u044F, \u0432\u044A\u0432\u0435\u0434\u0435\u0442\u0435 \u0432\u0430\u043B\u0438\u0434\u043D\u0430 \u0446\u0435\u043D\u0430 \u0432 \u0435\u0432\u0440\u043E \u0438\u043B\u0438 \u043B\u0432."
+              fieldId: el.id
             }
           })
         );
@@ -185,41 +229,88 @@
       input.classList.add("border-lime-600");
       autoConvert(input.id, input.value);
       return true;
+    } else if (value === "") {
+      input.classList.remove("border-red-600", "border-lime-600");
+      input.classList.add("border-gray-500");
     } else {
-      input.classList.remove("focus:border-orange-400");
       input.classList.add("border-red-600");
       return false;
     }
   }
+  function resetInput(input) {
+    if (!input) return;
+    input.value = "";
+    input.disabled = false;
+    input.classList.remove("border-lime-600", "border-red-600");
+    input.classList.add("border-gray-500");
+  }
   var RATE;
-  var init_calculations = __esm({
-    "src/scripts/calculations.js"() {
+  var init_data_handling = __esm({
+    "src/scripts/data-handling.js"() {
       RATE = 1.95583;
     }
   });
 
   // src/scripts/notifications.js
   function initNotifications() {
-    const messageLine = document.getElementById("messageLine");
-    if (!messageLine) {
-      console.warn("messageLine element not found");
-      return;
-    }
+    const messageIcon = document.getElementById("messageIcon");
     document.addEventListener("show-notification", (event) => {
-      const { type, message } = event.detail;
-      messageLine.textContent = message;
-      messageLine.classList.remove("text-yellow-300", "text-red-400", "text-green-400");
-      if (type === "success") {
-        messageLine.classList.add("text-green-400");
-      } else if (type === "error") {
-        messageLine.classList.add("text-red-400");
-      } else {
-        messageLine.classList.add("text-yellow-300");
+      const { type, fieldId } = event.detail;
+      updateChecklistStatus(fieldId, type);
+      if (messageIcon) messageIcon.innerHTML = "";
+      if (type === "error") {
+        messageIcon.innerHTML = `
+            <span class="relative flex items-center justify-center size-2.5">
+                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75"></span>
+                <span class="relative inline-flex items-center justify-center size-2.5 rounded-full bg-red-600 text-white">
+                    <i class="fa-solid fa-exclamation"></i>
+                </span>
+            </span>
+        `;
+      } else if (type === "success") {
+        messageIcon.innerHTML = `
+            <i class="fa-solid fa-circle-check text-lime-400"></i>
+        `;
       }
     });
   }
+  function getChecklistLine(fieldId) {
+    const lineNumber = checklistMap[fieldId];
+    if (!lineNumber) return null;
+    return document.querySelector(`.inputs-line-${lineNumber}`);
+  }
+  function updateChecklistStatus(fieldId, type) {
+    const li = getChecklistLine(fieldId);
+    if (!li) return;
+    let oldIcon = li.querySelector(".status-indicator");
+    if (oldIcon) oldIcon.remove();
+    const indicator = document.createElement("span");
+    indicator.className = "status-indicator ml-2";
+    if (type === "error") {
+      indicator.innerHTML = `
+            <span class="relative flex items-center justify-center size-2.5">
+                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75"></span>
+                <span class="relative inline-flex items-center justify-center size-2.5 rounded-full bg-red-600"></span>
+            </span>
+        `;
+    } else if (type === "success") {
+      indicator.innerHTML = `
+            <i class="fa-solid fa-circle-check text-lime-400"></i>
+        `;
+    }
+    li.appendChild(indicator);
+  }
+  var checklistMap;
   var init_notifications = __esm({
     "src/scripts/notifications.js"() {
+      checklistMap = {
+        priceEur: 1,
+        priceBgn: 1,
+        paidEur: 2,
+        paidBgn: 2,
+        changeEur: 3,
+        changeBgn: 3
+      };
     }
   });
 
@@ -228,14 +319,14 @@
     "src/scripts/main.js"() {
       init_theme_switch();
       init_calc_buttons();
-      init_calculations();
+      init_data_handling();
       init_notifications();
       document.addEventListener("DOMContentLoaded", () => {
         initThemeSwitch();
         initModeSwitch();
-        initNotifications();
         initInputsListener();
         calcKeypadToggle();
+        initNotifications();
       });
     }
   });

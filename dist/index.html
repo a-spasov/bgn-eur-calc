@@ -46,7 +46,8 @@
                 <!-- MODE SWITCH -->
                 <div class="flex items-center justify-end gap-3">
                     <!-- <span class="font-bold text-xs text-yellow-300 tracking-widest uppercase">Режим:</span> -->
-                    <div id="modeWrapper" class="relative flex rounded-md bg-slate-900 dark:bg-gray-300 p-1 select-none">
+                    <div id="modeWrapper"
+                        class="relative flex rounded-md bg-slate-900 dark:bg-gray-300 p-1 select-none">
                         <div id="modeSlider"
                             class="absolute top-1 left-1 h-5 w-[130px] rounded-sm bg-orange-500 transition-all duration-300 ease-out">
                         </div>
@@ -63,21 +64,28 @@
 
                 <div>
                     <!-- KEYPAD TOGGLE BUTTON -->
-                    <button id="toggleNumpad" class="rounded-lg text-base font-bold px-3 py-0 mr-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">
+                    <button id="toggleNumpad"
+                        class="rounded-lg text-base font-bold px-3 py-0 mr-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">
                         <i class="fa-solid fa-keyboard"></i>
                     </button>
 
                     <!-- RESET CALCULATOR -->
-                    <button class="rounded-lg text-base font-bold px-3 py-0 text-white bg-red-500 border-b-4 border-b-red-700 active:translate-y-[2px] active:border-b-0">
-                        <i class="fa-solid fa-rotate-left"></i> 
+                    <button
+                        class="rounded-lg text-base font-bold px-3 py-0 text-white bg-red-500 border-b-4 border-b-red-700 active:translate-y-[2px] active:border-b-0">
+                        <i class="fa-solid fa-rotate-left"></i>
                     </button>
                 </div>
             </div>
 
             <!-- DISPLAY -->
-            <div id="calcDisplay" class="flex flex-col mb-8 px-5 py-4 rounded-lg text-right text-5xl font-bold bg-slate-900 text-white dark:bg-gray-300 dark:text-gray-800">
-                <div id="messageLine" class=" transform transition-all duration-500 ease-in-expo text-yellow-300 text-sm text-left">Моля, въведете сума в евро или лв.</div>
-                <div id="resultsLine">0.00</div>
+            <div id="calcDisplay" class="w-lg h-30 flex flex-col mb-8 px-5 py-4 rounded-lg text-right text-5xl font-bold bg-slate-900 text-white dark:bg-gray-300 dark:text-gray-800">
+                <div id="messageLine" class="flex flex-col items-start justify-center gap-2 transform transition-all duration-500 ease-in-expo text-yellow-300 text-sm text-left">
+                    <div id="messageText">Искате да платите за стока/услуга в двете валути? Въведете:</div>
+                    <ul id="inputsChecklist">
+                        <!-- autofill based on mode -->
+                    </ul>
+                </div>
+                <div id="resultsLine" class="hidden">0.00</div>
             </div>
 
             <!-- INPUTS PANEL -->
@@ -89,7 +97,8 @@
                     <div class="relative">
                         <input id="priceEur" type="text" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
                             border border-gray-500 rounded-md outline-none
-                            focus:border-orange-400 disabled:opacity-50 placeholder-transparent" placeholder="Цена в евро (€)">
+                            focus:border-orange-400 disabled:opacity-50 placeholder-transparent"
+                            placeholder="Цена в евро (€)">
                         <label for="priceEur" class="absolute left-3 -top-2.5 px-1 bg-slate-700 dark:bg-gray-100
                             text-sm text-gray-300 dark:text-gray-700
                             transition-all peer-placeholder-shown:top-3
@@ -103,7 +112,8 @@
                     <div class="relative">
                         <input id="priceBgn" type="text" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
                             border border-gray-500 rounded-md outline-none
-                            focus:border-orange-400 disabled:opacity-50 placeholder-transparent" placeholder="Цена в лева">
+                            focus:border-orange-400 disabled:opacity-50 placeholder-transparent"
+                            placeholder="Цена в лева">
                         <label for="priceBgn" class="absolute left-3 -top-2.5 px-1 bg-slate-700 dark:bg-gray-100
                             text-sm text-gray-300 dark:text-gray-700
                             transition-all peer-placeholder-shown:top-3
@@ -147,7 +157,8 @@
                 </div>
 
                 <!-- ROW 3 -->
-                <div id="changeInputs" class="invisible opacity-0 grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-500 ease-in-expo">
+                <div id="changeInputs"
+                    class="invisible opacity-0 grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-500 ease-in-expo">
 
                     <div class="relative">
                         <input id="changeEur" type="text" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
@@ -180,32 +191,43 @@
             </div>
 
             <!-- KEYBOARD -->
-            <div
-                id="numpad"
-                class="relative grid grid-cols-4 grid-rows-4 gap-4 h-96 text-lg font-bold mt-auto transform transition-all duration-500 ease-in-expo visible opacity-100 xl:invisible xl:opacity-0"
-            >
+            <div id="numpad"
+                class="relative grid grid-cols-4 grid-rows-4 gap-4 h-96 text-lg font-bold mt-auto transform transition-all duration-500 ease-in-expo visible opacity-100 xl:invisible xl:opacity-0">
                 <!-- ROW 1 -->
-                <button class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">7</button>
-                <button class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">8</button>
-                <button class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">9</button>
-                <button class="row-span-2 rounded-xl text-2xl font-bold leading-none px-4 py-3 text-white bg-orange-500 border-b-4 border-b-orange-700 active:translate-y-[2px] active:border-b-0">
+                <button
+                    class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">7</button>
+                <button
+                    class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">8</button>
+                <button
+                    class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">9</button>
+                <button
+                    class="row-span-2 rounded-xl text-2xl font-bold leading-none px-4 py-3 text-white bg-orange-500 border-b-4 border-b-orange-700 active:translate-y-[2px] active:border-b-0">
                     <i class="fa-solid fa-trash"></i>
-                </button> 
+                </button>
                 <!-- ROW 2 -->
-                <button class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">4</button>
-                <button class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">5</button>
-                <button class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">6</button>
+                <button
+                    class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">4</button>
+                <button
+                    class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">5</button>
+                <button
+                    class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">6</button>
                 <!-- ROW 3 -->
-                <button class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">1</button>
-                <button class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">2</button>
-                <button class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">3</button>
-                <button class="row-span-2 rounded-xl text-2xl font-bold leading-none px-4 py-3 text-white bg-red-500 border-b-4 border-b-red-700 active:translate-y-[2px] active:border-b-0">
-                    <i class="fa-solid fa-rotate-left"></i> 
+                <button
+                    class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">1</button>
+                <button
+                    class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">2</button>
+                <button
+                    class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">3</button>
+                <button
+                    class="row-span-2 rounded-xl text-2xl font-bold leading-none px-4 py-3 text-white bg-red-500 border-b-4 border-b-red-700 active:translate-y-[2px] active:border-b-0">
+                    <i class="fa-solid fa-rotate-left"></i>
                 </button>
                 <!-- ROW 4 -->
-                 <button class="col-span-2 rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">
+                <button
+                    class="col-span-2 rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">
                     0 </button>
-                <button class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-slate-500 text-white border-b-4 border-b-slate-600 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">.</button>
+                <button
+                    class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-slate-500 text-white border-b-4 border-b-slate-600 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">.</button>
             </div>
 
         </div>
