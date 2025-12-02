@@ -3,13 +3,13 @@ import {
     initModeSwitch,
     calcKeypadToggle,
 } from './calc-buttons.js';
-import {initInputsListener} from './calculations.js';
+import {initInputsListener} from './data-handling.js';
 import { initNotifications } from './notifications.js';
 
 document.addEventListener("DOMContentLoaded", () => {
     initThemeSwitch();
     initModeSwitch();
-    initNotifications();
     initInputsListener();
     calcKeypadToggle();
+    initNotifications();
 });
