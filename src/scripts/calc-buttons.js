@@ -1,3 +1,42 @@
+let currentMode = "payment";
+
+function updateScreenText() {
+    const checklist = document.getElementById("inputsChecklist");
+    const changeInputs = document.getElementById("changeInputs");
+    const messageText = document.getElementById("messageText");
+
+    if (!checklist || !changeInputs || !messageText) return;
+
+    checklist.innerHTML = "";
+
+    const isPaymentMode = changeInputs.classList.contains("payment-mode");
+
+    messageText.textContent = isPaymentMode
+        ? "Искате да платите за стока/услуга в двете валути? Въведете:"
+        : "Искате да изчислите ресто в евро и лв.? Въведете:";
+
+    const items = isPaymentMode
+        ? [
+            "- обща цена в евро или лв.",
+            "- платена сума в евро или лв."
+        ]
+        : [
+            "- обща цена в евро или лв.",
+            "- платена сума в евро и/или лв.",
+            "- върната сума в евро или лв. (важи само за смесено ресто)"
+        ];
+
+    let itemCounter = 1;
+
+    items.forEach(text => {
+        const li = document.createElement("li");
+        li.textContent = text;
+        li.classList.add(`inputs-line-${itemCounter}`)
+        checklist.appendChild(li);
+        itemCounter++;
+    });
+}
+
 function initModeSwitch() {
     const modePayment = document.getElementById("modePayment");
     const modeChange = document.getElementById("modeChange");
@@ -25,6 +64,7 @@ function initModeSwitch() {
     }
 
     function activatePaymentMode() {
+        currentMode = "payment";
         const numpad = document.getElementById("numpad");
         const isKeyboardOn = numpad?.classList.contains("keyboard-on");
 
@@ -38,11 +78,14 @@ function initModeSwitch() {
             setTimeout(() => {
                 numpad.style.transform = "translateY(-74px)";
             }, 800);
-         
+
         }
+
+     updateScreenText();
     }
 
     function activateChangeMode() {
+        currentMode = "change";
         const numpad = document.getElementById("numpad");
         const isKeyboardOn = numpad?.classList.contains("keyboard-on");
 
@@ -59,6 +102,8 @@ function initModeSwitch() {
         } else {
             changeInputs.classList.remove("invisible", "opacity-0", "payment-mode");
         }
+
+     updateScreenText();
     }
 
     modePayment.addEventListener("click", activatePaymentMode);
