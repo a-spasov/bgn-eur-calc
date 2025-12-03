@@ -1,12 +1,12 @@
-import {initThemeSwitch} from './theme-switch.js';
-import {initModeSwitch, kbdToggleAnimation} from './calc-interface.js';
-import {initInputsListener} from './inputs-handling.js';
-import { initNotifications } from './notifications.js';
+import { initThemeSwitch } from "./utils.js";
+import { initModeSwitch, initKeypadToggle, initResetButton, initInputFeedback } from "./calc-interface.js";
+import { initInputsListener } from "./inputs-handling.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     initThemeSwitch();
     initModeSwitch();
+    initInputFeedback();
     initInputsListener();
-    kbdToggleAnimation();
-    initNotifications();
+    initKeypadToggle();
+    initResetButton();
 });
