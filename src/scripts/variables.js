@@ -29,6 +29,7 @@ export const store = {
         changeEur: null,
         changeBgn: null,
     },
+    activeInput: null,
     validation: {
         priceValid: false,
         paidValid: false,

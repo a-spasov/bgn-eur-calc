@@ -1,5 +1,5 @@
 import { elements, store } from "./variables.js";
-import { resetAll } from "./inputs-handling.js";
+import { resetAll, validateInput } from "./inputs-handling.js";
 
 function updateDisplayText() {
     const { checklist, messageText } = elements;
@@ -214,10 +214,48 @@ function initResetButton() {
     });
 }
 
+function initKeypadInput() {
+    const { numpad } = elements;
+
+    if (!numpad) return;
+
+    numpad.addEventListener("click", (event) => {
+        const btn = event.target.closest("button");
+        if (!btn) return;
+
+        if (!store.activeInput) return;
+
+        const input = store.activeInput;
+        const value = btn.textContent.trim();
+
+        if (btn.querySelector(".fa-trash")) {
+            input.value = input.value.slice(0, -1);
+        } 
+        else if (btn.querySelector(".fa-rotate-left")) {
+            input.value = "";
+        }
+        else {
+            input.value += value;
+        }
+
+        input.focus();
+
+        store.inputs[input.id] = input.value;
+
+        const valid = validateInput(input);
+
+        document.dispatchEvent(new CustomEvent("show-notification", {
+            detail: { type: valid ? "success" : "error", fieldId: input.id }
+        }));
+    });
+}
+
+
 export {
     updateDisplayText,
     initModeSwitch,
     initKeypadToggle,
     initResetButton,
     initInputFeedback,
+    initKeypadInput,
 };

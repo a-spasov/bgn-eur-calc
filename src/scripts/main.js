@@ -1,5 +1,5 @@
 import { initThemeSwitch } from "./utils.js";
-import { initModeSwitch, initKeypadToggle, initResetButton, initInputFeedback } from "./calc-interface.js";
+import { initModeSwitch, initKeypadToggle, initResetButton, initInputFeedback, initKeypadInput } from "./calc-interface.js";
 import { initInputsListener } from "./inputs-handling.js";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -9,4 +9,5 @@ document.addEventListener("DOMContentLoaded", () => {
     initInputsListener();
     initKeypadToggle();
     initResetButton();
+    initKeypadInput();
 });

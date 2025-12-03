@@ -157,6 +157,13 @@ function initInputsListener() {
         },
         false
     );
+
+    wrapper.addEventListener("focusin", (event) => {
+        const input = event.target;
+        if (input.matches("input")) {
+            store.activeInput = input;
+        }
+    });
 }
 
-export { initInputsListener, resetAll };
+export { initInputsListener, resetAll, validateInput };
