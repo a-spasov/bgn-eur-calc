@@ -27,8 +27,8 @@
     }
   });
 
-  // src/scripts/calc-buttons.js
-  function updateScreenText() {
+  // src/scripts/calc-interface.js
+  function initDisplayText() {
     const checklist = document.getElementById("inputsChecklist");
     const changeInputs = document.getElementById("changeInputs");
     const messageText = document.getElementById("messageText");
@@ -86,7 +86,7 @@
           numpad.style.transform = "translateY(-74px)";
         }, 800);
       }
-      updateScreenText();
+      initDisplayText();
     }
     function activateChangeMode() {
       currentMode = "change";
@@ -103,13 +103,13 @@
       } else {
         changeInputs.classList.remove("invisible", "opacity-0", "payment-mode");
       }
-      updateScreenText();
+      initDisplayText();
     }
     modePayment.addEventListener("click", activatePaymentMode);
     modeChange.addEventListener("click", activateChangeMode);
     activatePaymentMode();
   }
-  function calcKeypadToggle() {
+  function kbdToggleAnimation() {
     const toggleBtn = document.getElementById("toggleNumpad");
     const numpad = document.getElementById("numpad");
     if (!toggleBtn || !numpad) {
@@ -136,13 +136,13 @@
     });
   }
   var currentMode;
-  var init_calc_buttons = __esm({
-    "src/scripts/calc-buttons.js"() {
+  var init_calc_interface = __esm({
+    "src/scripts/calc-interface.js"() {
       currentMode = "payment";
     }
   });
 
-  // src/scripts/data-handling.js
+  // src/scripts/inputs-handling.js
   function autoConvert(inputElemId, value) {
     const val = parseFloat(value);
     if (isNaN(val)) return;
@@ -245,8 +245,8 @@
     input.classList.add("border-gray-500");
   }
   var RATE;
-  var init_data_handling = __esm({
-    "src/scripts/data-handling.js"() {
+  var init_inputs_handling = __esm({
+    "src/scripts/inputs-handling.js"() {
       RATE = 1.95583;
     }
   });
@@ -318,14 +318,14 @@
   var require_main = __commonJS({
     "src/scripts/main.js"() {
       init_theme_switch();
-      init_calc_buttons();
-      init_data_handling();
+      init_calc_interface();
+      init_inputs_handling();
       init_notifications();
       document.addEventListener("DOMContentLoaded", () => {
         initThemeSwitch();
         initModeSwitch();
         initInputsListener();
-        calcKeypadToggle();
+        kbdToggleAnimation();
         initNotifications();
       });
     }

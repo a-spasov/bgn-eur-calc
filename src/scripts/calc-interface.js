@@ -1,6 +1,6 @@
 let currentMode = "payment";
 
-function updateScreenText() {
+function initDisplayText() {
     const checklist = document.getElementById("inputsChecklist");
     const changeInputs = document.getElementById("changeInputs");
     const messageText = document.getElementById("messageText");
@@ -81,7 +81,7 @@ function initModeSwitch() {
 
         }
 
-     updateScreenText();
+     initDisplayText();
     }
 
     function activateChangeMode() {
@@ -103,7 +103,7 @@ function initModeSwitch() {
             changeInputs.classList.remove("invisible", "opacity-0", "payment-mode");
         }
 
-     updateScreenText();
+     initDisplayText();
     }
 
     modePayment.addEventListener("click", activatePaymentMode);
@@ -112,7 +112,7 @@ function initModeSwitch() {
     activatePaymentMode();
 }
 
-function calcKeypadToggle() {
+function kbdToggleAnimation() {
     const toggleBtn = document.getElementById("toggleNumpad");
     const numpad = document.getElementById("numpad");
 
@@ -145,6 +145,6 @@ function calcKeypadToggle() {
 
 export {
     initModeSwitch,
-    calcKeypadToggle,
+    kbdToggleAnimation,
 };
 
