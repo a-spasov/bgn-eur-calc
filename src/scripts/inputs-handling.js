@@ -1,4 +1,6 @@
 import { elements, store } from "./variables.js";
+import { calculatePayment, calculateChange } from "./calculations.js";
+import { updateResultDisplay } from "./calc-interface.js";
 
 function autoConvert(fieldId, rawValue) {
     const value = parseFloat(rawValue);
@@ -37,6 +39,21 @@ function formatCurrency(input) {
     input.value = number.toFixed(2);
 }
 
+function safeFormat(input) {
+    if (!input) return;
+
+    const fieldId = input.id;
+
+    if (store.validation[fieldId] !== true) return;
+
+    const n = parseFloat(input.value.replace(",", "."));
+    if (!isNaN(n)) {
+        formatCurrency(input);
+        store.inputs[fieldId] = input.value;
+    }
+}
+
+
 function markValid(input) {
     input.classList.remove("border-red-600", "border-gray-500");
     input.classList.add("border-lime-600");
@@ -63,6 +80,15 @@ function validateInput(input) {
     if (value === "") {
         clearValidation(input);
         store.validation[fieldId] = false;
+        if (fieldId === "priceEur") {
+            resetInput(elements.priceBgn);
+            elements.priceBgn.disabled = false;
+        }
+
+        if (fieldId === "priceBgn") {
+            resetInput(elements.priceEur);
+            elements.priceEur.disabled = false;
+        }
         return false;
     }
 
@@ -77,6 +103,8 @@ function validateInput(input) {
 
     markInvalid(input);
     store.validation[fieldId] = false;
+    if (fieldId === "priceEur") resetInput(elements.priceBgn);
+    if (fieldId === "priceBgn") resetInput(elements.priceEur);
     return false;
 }
 
@@ -102,6 +130,7 @@ function resetAll() {
         resultsLine,
     } = elements;
 
+    // Reset all input fields
     resetInput(priceEur);
     resetInput(priceBgn);
     resetInput(paidEur);
@@ -109,7 +138,21 @@ function resetAll() {
     resetInput(changeEur);
     resetInput(changeBgn);
 
-    if (resultsLine) resultsLine.textContent = "0.00";
+    // --- DISPLAY RESET LOGIC (NO display:none!) ---
+
+    // Hide results (fade out)
+    if (resultsLine) {
+        resultsLine.classList.remove("opacity-100");
+        resultsLine.classList.add("opacity-0", "pointer-events-none");
+        resultsLine.innerHTML = "";
+    }
+
+    // Show instructions (fade in)
+    const instructions = document.getElementById("messageLine");
+    if (instructions) {
+        instructions.classList.remove("opacity-0", "pointer-events-none");
+        instructions.classList.add("opacity-100");
+    }
 }
 
 function initInputsListener() {
@@ -125,6 +168,17 @@ function initInputsListener() {
 
         const valid = validateInput(input);
 
+        // Trigger calculation when inputs change
+        let result = null;
+
+        if (store.mode === "payment") {
+            result = calculatePayment();
+        } else if (store.mode === "change") {
+            result = calculateChange();
+        }
+
+        updateResultDisplay(result);
+
         document.dispatchEvent(
             new CustomEvent("show-notification", {
                 detail: { type: valid ? "success" : "error", fieldId: input.id },
@@ -132,38 +186,27 @@ function initInputsListener() {
         );
     });
 
-    wrapper.addEventListener(
-        "blur",
-        (event) => {
-            const input = event.target;
-            if (!input.matches("input")) return;
-
-            const valid = validateInput(input);
-
-            if (valid) {
-                formatCurrency(input);
-            }
-
-            if (input.closest("#priceInputs")) {
-                if (input.id === "priceEur") resetInput(elements.priceBgn);
-                if (input.id === "priceBgn") resetInput(elements.priceEur);
-            }
-
-            document.dispatchEvent(
-                new CustomEvent("show-notification", {
-                    detail: { type: valid ? "success" : "error", fieldId: input.id },
-                })
-            );
-        },
-        false
-    );
-
     wrapper.addEventListener("focusin", (event) => {
         const input = event.target;
         if (input.matches("input")) {
+            if (store.activeInput && store.activeInput !== input) {
+                safeFormat(store.activeInput);
+            }
+
             store.activeInput = input;
         }
     });
+
+    document.addEventListener("click", (event) => {
+        const active = store.activeInput;
+        if (!active) return;
+
+        if (event.target === active || active.contains(event.target)) return;
+
+        if (event.target.closest("#numpad")) return;
+
+        safeFormat(active);
+    });
 }
 
-export { initInputsListener, resetAll, validateInput };
+export { initInputsListener, formatCurrency, resetAll, validateInput };

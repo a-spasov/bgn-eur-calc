@@ -1,5 +1,5 @@
 import { elements, store } from "./variables.js";
-import { resetAll, validateInput } from "./inputs-handling.js";
+import { formatCurrency, resetAll, validateInput } from "./inputs-handling.js";
 
 function updateDisplayText() {
     const { checklist, messageText } = elements;
@@ -30,7 +30,7 @@ function updateDisplayText() {
         const indicator = document.createElement("span");
         indicator.className = `
             check-indicator inline-block
-            w-3 h-3 rounded-full border border-current
+            size-3 rounded-full border border-current
             opacity-50
         `;
 
@@ -40,26 +40,15 @@ function updateDisplayText() {
     });
 }
 
-const checklistMap = {
-    priceEur: 1,
-    priceBgn: 1,
-    paidEur: 2,
-    paidBgn: 2,
-    changeEur: 3,
-    changeBgn: 3,
-};
-
 function setIndicatorIdle(el) {
-    el.className = `
-        check-indicator inline-block w-3 h-3 rounded-full 
-        border border-current opacity-50
-    `;
+    el.innerHTML = "";
+    el.className = `check-indicator inline-block size-3 rounded-full border border-current opacity-50`;
 }
 
 function setIndicatorSuccess(el) {
     el.className = `
         check-indicator inline-flex items-center justify-center 
-        w-3 h-3 rounded-full bg-lime-500 text-white
+        size-3 rounded-full bg-lime-500 text-white
     `;
     el.innerHTML = `<i class="fa-solid fa-check text-[8px] leading-none"></i>`;
 }
@@ -67,11 +56,11 @@ function setIndicatorSuccess(el) {
 function setIndicatorError(el) {
     el.className = `
         check-indicator relative inline-flex items-center justify-center 
-        w-3 h-3 rounded-full bg-red-600
+        size-3 rounded-full bg-red-600
     `;
     el.innerHTML = `
-        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75"></span>
-        <span class="relative block w-3 h-3 rounded-full bg-red-600"></span>
+        <span class="absolute inline-flex size-full animate-ping rounded-full bg-red-500 opacity-75"></span>
+        <span class="relative block size-3 rounded-full bg-red-600"></span>
     `;
 }
 
@@ -182,6 +171,13 @@ function initModeSwitch() {
 function initKeypadToggle() {
     const { toggleNumpad, numpad } = elements;
 
+    numpad.addEventListener("mousedown", (event) => {
+        const btn = event.target.closest("button");
+        if (!btn) return;
+
+        event.preventDefault();
+    });
+
     toggleNumpad.addEventListener("click", () => {
         const isPaymentMode = store.mode === "payment";
 
@@ -230,7 +226,7 @@ function initKeypadInput() {
 
         if (btn.querySelector(".fa-trash")) {
             input.value = input.value.slice(0, -1);
-        } 
+        }
         else if (btn.querySelector(".fa-rotate-left")) {
             input.value = "";
         }
@@ -247,9 +243,84 @@ function initKeypadInput() {
         document.dispatchEvent(new CustomEvent("show-notification", {
             detail: { type: valid ? "success" : "error", fieldId: input.id }
         }));
+        input.dispatchEvent(new Event("input", { bubbles: true }));
     });
 }
 
+function updateResultDisplay(result) {
+    const instructions = document.getElementById("messageLine");
+    const results = elements.resultsLine;
+
+    if (!instructions || !results) return;
+
+    // CASE 1 — No result → show instructions
+    if (!result) {
+        instructions.classList.remove("opacity-0", "pointer-events-none");
+        instructions.classList.add("opacity-100");
+
+        results.classList.remove("opacity-100");
+        results.classList.add("opacity-0", "pointer-events-none");
+
+        results.innerHTML = "";
+        return;
+    }
+
+    // Fade OUT instructions
+    instructions.classList.remove("opacity-100");
+    instructions.classList.add("opacity-0", "pointer-events-none");
+
+    // Fade IN results
+    results.classList.remove("opacity-0", "pointer-events-none");
+    results.classList.add("opacity-100");
+
+    // WARNING
+    if (result.type === "warning") {
+        results.innerHTML = `
+        <div class="flex items-center gap-2 text-yellow-400 font-semibold text-base">
+            <span class="relative size-3 inline-flex items-center justify-center">
+                <span class="absolute size-3 rounded-full bg-red-500 opacity-75 animate-ping"></span>
+                <span class="relative size-3 rounded-full bg-red-600"></span>
+            </span>
+            ${result.message}
+        </div>
+    `;
+        return;
+    }
+
+    const paidIsEUR = result.paidLabel.includes("евро");
+    // RESULT
+    results.innerHTML = `
+    <div class="text-sm">
+        Цена:
+        <span class="ml-2 mr-1 font-bold text-blue-300">
+            <span class="text-base text-shadow-lg">${result.priceEUR.toFixed(2)}</span> евро
+        </span>
+        /
+        <span class="ml-1 font-bold text-orange-400">
+            <span class="text-base text-shadow-lg">${result.priceBGN.toFixed(2)}</span> лв.
+        </span>
+    </div>
+
+    <div class="text-sm">
+        Платени до момента:
+        <span class="ml-2 font-bold ${paidIsEUR ? "text-blue-300" : "text-orange-400"}">
+            <span class="text-base text-shadow-lg">${result.paidLabel}</span>
+        </span>
+    </div>
+
+    <div class="text-sm">
+        Остават за доплащане:
+        <span class="ml-2 font-bold text-blue-300">
+            <span class="text-base text-shadow-lg">${result.remainingEUR.toFixed(2)}</span> евро
+        </span>
+        или
+        <span class="ml-1 font-bold text-orange-400">
+            <span class="text-base text-shadow-lg">${result.remainingBGN.toFixed(2)}</span> лв.
+        </span>
+    </div>
+`;
+
+}
 
 export {
     updateDisplayText,
@@ -258,4 +329,5 @@ export {
     initResetButton,
     initInputFeedback,
     initKeypadInput,
+    updateResultDisplay
 };

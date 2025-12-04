@@ -15,6 +15,7 @@ export const elements = {
     numpad: document.getElementById("numpad"),
     toggleNumpad: document.getElementById("toggleNumpad"),
     messageIcon: document.getElementById("messageIcon"),
+    resultsLine: document.getElementById("resultsLine"),
 };
 
 export const store = {
