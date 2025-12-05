@@ -53,6 +53,47 @@ function safeFormat(input) {
     }
 }
 
+function handleChangeField(input, maxEur, maxBgn) {
+    const id = input.id;
+    const value = parseFloat(input.value.replace(",", "."));
+
+    const { changeEur, changeBgn } = elements;
+
+    // Unlock behavior
+    if (!input.value) {
+        if (id === "changeEur") changeBgn.disabled = false;
+        if (id === "changeBgn") changeEur.disabled = false;
+
+        clearValidation(changeEur);
+        clearValidation(changeBgn);
+        return { valid: true, mixed: false };
+    }
+
+    // Lock the opposite field
+    if (id === "changeEur") changeBgn.disabled = true;
+    if (id === "changeBgn") changeEur.disabled = true;
+
+    // Validate against max allowed change
+    if (isNaN(value)) {
+        markInvalid(input);
+        return { valid: false };
+    }
+
+    if (
+        (id === "changeEur" && value > maxEur) ||
+        (id === "changeBgn" && value > maxBgn)
+    ) {
+        markInvalid(input);
+        return {
+            valid: false,
+            warning: "Въведената сума е по-голяма от дължимото ресто",
+        };
+    }
+
+    markValid(input);
+
+    return { valid: true, mixed: true };
+}
 
 function markValid(input) {
     input.classList.remove("border-red-600", "border-gray-500");
@@ -70,42 +111,53 @@ function clearValidation(input) {
 }
 
 function validateInput(input) {
-    let value = input.value.replace(",", ".");
-    const numericPattern = /^(\d+(\.\d*)?|\.\d*)$/;
-
     const fieldId = input.id;
+    const raw = input.value; // DO NOT MODIFY
+    const value = raw.replace(",", ".");
 
-    store.inputs[fieldId] = input.value;
+    store.inputs[fieldId] = raw;
 
-    if (value === "") {
-        clearValidation(input);
+    // 1) Check for invalid characters (keep raw text)
+    // Allowed: digits and ONE dot
+    if (/[^0-9.]/.test(raw)) {
+        markInvalid(input);
         store.validation[fieldId] = false;
-        if (fieldId === "priceEur") {
-            resetInput(elements.priceBgn);
-            elements.priceBgn.disabled = false;
-        }
 
-        if (fieldId === "priceBgn") {
-            resetInput(elements.priceEur);
-            elements.priceEur.disabled = false;
-        }
+        // Show red ping + stop all calculations
+        updateResultDisplay({
+            type: "warning",
+            message: "Невалидни символи. Моля, въведете само числа."
+        });
+
         return false;
     }
 
-    if (numericPattern.test(value)) {
-        input.value = value;
-        markValid(input);
-        store.validation[fieldId] = true;
-
-        autoConvert(fieldId, input.value);
-        return true;
+    // Empty input resets validation
+    if (raw === "") {
+        clearValidation(input);
+        store.validation[fieldId] = false;
+        return false;
     }
 
-    markInvalid(input);
-    store.validation[fieldId] = false;
-    if (fieldId === "priceEur") resetInput(elements.priceBgn);
-    if (fieldId === "priceBgn") resetInput(elements.priceEur);
-    return false;
+    // 2) Validate numeric structure (only one dot allowed)
+    if ((value.match(/\./g) || []).length > 1) {
+        markInvalid(input);
+        store.validation[fieldId] = false;
+        updateResultDisplay({
+            type: "warning",
+            message: "Невалиден формат. Използвайте само една десетична точка."
+        });
+        return false;
+    }
+
+    // 3) Valid numeric text → mark as valid
+    markValid(input);
+    store.validation[fieldId] = true;
+
+    // AUTO CONVERT ONLY FOR PRICE, NOT for paid/change
+    autoConvert(fieldId, value);
+
+    return true;
 }
 
 function resetInput(input) {
@@ -168,14 +220,81 @@ function initInputsListener() {
 
         const valid = validateInput(input);
 
-        // Trigger calculation when inputs change
-        let result = null;
+// ❗ STOP everything if invalid input
+if (!valid) {
+    // Show nothing except the error message already set
+    return;
+}
+
+// Now it's safe to continue
+let result = null;
 
         if (store.mode === "payment") {
             result = calculatePayment();
         } else if (store.mode === "change") {
             result = calculateChange();
         }
+
+        // CHANGE MODE partial change handling
+        if (store.mode === "change" && (input.id === "changeEur" || input.id === "changeBgn")) {
+
+            const result = calculateChange(); // общото ресто
+
+            if (!result || result.type !== "change") {
+                updateResultDisplay(result || null);
+                return;
+            }
+
+            const { maxEur, maxBgn } = result;
+
+            const state = handleChangeField(input, maxEur, maxBgn);
+
+            if (!state.valid) {
+                updateResultDisplay({
+                    type: "warning",
+                    message: state.warning || "Невалидна стойност"
+                });
+                return;
+            }
+
+            if (state.mixed) {
+    const partial = parseFloat(input.value.replace(",", "."));
+
+    // VALIDATION: partial > total change?
+    if (
+        (input.id === "changeEur" && partial > result.totalChangeEUR) ||
+        (input.id === "changeBgn" && partial > result.totalChangeBGN)
+    ) {
+        markInvalid(input);
+
+        updateResultDisplay({
+            type: "warning",
+            message: "Внимание! Въведената сума за частично ресто е по-голяма от цялата стойност на рестото."
+        });
+
+        return;
+    }
+
+    let mixedEur, mixedBgn;
+
+    if (input.id === "changeEur") {
+        mixedEur = partial;
+        mixedBgn = (result.totalChangeEUR - partial) * store.rate;
+    } else {
+        mixedBgn = partial;
+        mixedEur = (result.totalChangeBGN - partial) / store.rate;
+    }
+
+    result.hasMixed = true;
+    result.mixedEur = mixedEur;
+    result.mixedBgn = mixedBgn;
+}
+
+
+            updateResultDisplay(result);
+            return;
+        }
+
 
         updateResultDisplay(result);
 

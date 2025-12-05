@@ -273,7 +273,7 @@ function updateResultDisplay(result) {
     results.classList.remove("opacity-0", "pointer-events-none");
     results.classList.add("opacity-100");
 
-    // WARNING
+    // WARNING (applies only to payment mode)
     if (result.type === "warning") {
         results.innerHTML = `
         <div class="flex items-center gap-2 text-yellow-400 font-semibold text-base">
@@ -282,45 +282,136 @@ function updateResultDisplay(result) {
                 <span class="relative size-3 rounded-full bg-red-600"></span>
             </span>
             ${result.message}
-        </div>
+        </div>`;
+        return;
+    }
+    // ============================
+    // ========== CHANGE MODE =====
+    // ============================
+    if (result.type === "change") {
+
+        // --- ALWAYS compute unified received values ---
+        let totalPaidEUR = 0;
+        if (result.paidEur !== null) totalPaidEUR += result.paidEur;
+        if (result.paidBgn !== null) totalPaidEUR += result.paidBgn / store.rate;
+
+        let totalPaidBGN = totalPaidEUR * store.rate;
+
+        // Unified RECEIVED line for all cases
+        const receivedLine = `
+        Получени:
+        <span class="ml-2 font-bold text-blue-300">
+            ${totalPaidEUR.toFixed(2)} евро
+        </span>
+        <span class="ml-2">
+            ( = <span class="font-bold text-orange-400">${totalPaidBGN.toFixed(2)} лв.</span> )
+        </span>
     `;
+
+        // Line 1: PRICE
+        const priceLine = `
+        Цена:
+        <span class="ml-2 font-bold text-blue-300">
+            ${result.priceEUR.toFixed(2)} евро
+        </span>
+        <span class="ml-2">
+            ( = <span class="font-bold text-orange-400">${result.priceBGN.toFixed(2)} лв.</span> )
+        </span>
+    `;
+
+        // Line 3: CHANGE / MIXED CHANGE
+        let changeLine = "";
+
+        if (result.hasMixed) {
+            // Mixed change: show eur + bgn combination
+            changeLine = `
+            Ресто: 
+            <span class="ml-2 font-bold text-blue-300">
+                ${result.mixedEur.toFixed(2)} евро
+            </span>
+            и
+            <span class="ml-1 font-bold text-orange-400">
+                ${result.mixedBgn.toFixed(2)} лв.
+            </span>
+            <span class="align-top text-red-500 font-bold">*</span>
+        `;
+        } else {
+            // Normal change
+            changeLine = `
+            Ресто: 
+            <span class="ml-2 font-bold text-blue-300">
+                ${Math.abs(result.totalChangeEUR).toFixed(2)} евро
+            </span>
+            ( или 
+            <span class="font-bold text-orange-400">
+                ${Math.abs(result.totalChangeBGN).toFixed(2)} лв.
+            </span>
+            )
+            <span class="align-top text-red-500 font-bold">*</span>
+        `;
+        }
+
+        // Render final 3 lines + optional note
+        results.innerHTML = `
+        <div class="text-sm">
+            ${priceLine}
+        </div>
+
+        <div class="text-sm">
+            ${receivedLine}
+        </div>
+
+        <div class="text-sm">
+            ${changeLine}
+        </div>
+        <div class="text-xs mt-1 text-gray-300 tracking-widest font-bold">
+                    <span class="font-bold text-red-500">*</span>
+                    За смесено ресто използвайте последните две полета
+                   </div>
+    `;
+
         return;
     }
 
+
+    // ============================
+    // ========== PAYMENT MODE ====
+    // ============================
     const paidIsEUR = result.paidLabel.includes("евро");
-    // RESULT
+
     results.innerHTML = `
-    <div class="text-sm">
-        Цена:
-        <span class="ml-2 mr-1 font-bold text-blue-300">
-            <span class="text-base text-shadow-lg">${result.priceEUR.toFixed(2)}</span> евро
-        </span>
-        /
-        <span class="ml-1 font-bold text-orange-400">
-            <span class="text-base text-shadow-lg">${result.priceBGN.toFixed(2)}</span> лв.
-        </span>
-    </div>
+        <div class="text-sm">
+            Цена:
+            <span class="ml-2 mr-1 font-bold text-blue-300">
+                <span class="text-base text-shadow-lg">${result.priceEUR.toFixed(2)}</span> евро
+            </span>
+            ( = 
+            <span class="ml-1 font-bold text-orange-400">
+                <span class="text-base text-shadow-lg">${result.priceBGN.toFixed(2)}</span> лв.
+            </span>
+            )
+        </div>
 
-    <div class="text-sm">
-        Платени до момента:
-        <span class="ml-2 font-bold ${paidIsEUR ? "text-blue-300" : "text-orange-400"}">
-            <span class="text-base text-shadow-lg">${result.paidLabel}</span>
-        </span>
-    </div>
+        <div class="text-sm">
+            Платени до момента:
+            <span class="ml-2 font-bold ${paidIsEUR ? "text-blue-300" : "text-orange-400"}">
+                <span class="text-base text-shadow-lg">${result.paidLabel}</span>
+            </span>
+        </div>
 
-    <div class="text-sm">
-        Остават за доплащане:
-        <span class="ml-2 font-bold text-blue-300">
-            <span class="text-base text-shadow-lg">${result.remainingEUR.toFixed(2)}</span> евро
-        </span>
-        или
-        <span class="ml-1 font-bold text-orange-400">
-            <span class="text-base text-shadow-lg">${result.remainingBGN.toFixed(2)}</span> лв.
-        </span>
-    </div>
-`;
-
+        <div class="text-sm">
+            Остават за доплащане:
+            <span class="ml-2 mr-1 font-bold text-blue-300">
+                <span class="text-base text-shadow-lg">${result.remainingEUR.toFixed(2)}</span> евро
+            </span>
+            или
+            <span class="ml-1 font-bold text-orange-400">
+                <span class="text-base text-shadow-lg">${result.remainingBGN.toFixed(2)}</span> лв.
+            </span>
+        </div>
+    `;
 }
+
 
 export {
     updateDisplayText,
