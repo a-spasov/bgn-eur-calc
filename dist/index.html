@@ -70,8 +70,7 @@
                     </button>
 
                     <!-- RESET CALCULATOR -->
-                    <button
-                        id="resetCalc"
+                    <button id="resetCalc"
                         class="rounded-lg text-base font-bold px-3 py-0 text-white bg-red-500 border-b-4 border-b-red-700 active:translate-y-[2px] active:border-b-0">
                         <i class="fa-solid fa-rotate-left"></i>
                     </button>
@@ -79,24 +78,34 @@
             </div>
 
             <!-- DISPLAY -->
-            <div id="calcDisplay" class="w-lg h-30 flex flex-col mb-8 px-5 py-4 rounded-lg text-right text-5xl font-bold bg-slate-900 text-white dark:bg-gray-300 dark:text-gray-800">
-                <div id="messageLine" class="flex flex-col items-start justify-center gap-2 transform transition-all duration-500 ease-in-expo text-yellow-300 text-sm text-left">
-                    <div id="messageText">Искате да платите за стока/услуга в двете валути? Въведете:</div>
-                    <ul id="inputsChecklist">
-                        <!-- autofill based on mode -->
-                    </ul>
+            <div id="calcDisplay" class="relative w-lg h-30 flex flex-col mb-8 px-5 py-4 rounded-lg bg-slate-900 text-white dark:bg-gray-300 dark:text-gray-800">
+                <!-- INSTRUCTIONS -->
+                <div id="messageLine" class="flex flex-col items-start justify-center gap-2
+                transition-opacity duration-500 ease-in-out
+                text-yellow-300 text-sm text-left opacity-100">
+
+                    <div id="messageText">
+                        Искате да платите за стока/услуга в двете валути? Въведете:
+                    </div>
+
+                    <ul id="inputsChecklist"></ul>
                 </div>
-                <div id="resultsLine" class="hidden">0.00</div>
+
+                <!-- RESULTS (absolute overlay) -->
+                <div id="resultsLine" class="absolute top-0 left-0 w-full h-full flex flex-col justify-center items-start gap-1 px-5 py-4 transition-opacity duration-500 ease-in-out opacity-0 text-yellow-300 text-left text-sm">
+                </div>
+
             </div>
 
+
             <!-- INPUTS PANEL -->
-            <div id="calcInputs" class="grid grid-cols-1 gap-6 text-left mb-8">
+            <div id="calcInputs" class="grid grid-cols-1 gap-4 text-left mb-8">
 
                 <!-- ROW 1 -->
                 <div id="priceInputs" class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                     <div class="relative">
-                        <input id="priceEur" type="text" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
+                        <input id="priceEur" type="text" autocomplete="off" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
                             border border-gray-500 rounded-md outline-none
                             focus:border-orange-400 disabled:opacity-50 placeholder-transparent"
                             placeholder="Цена в евро (€)">
@@ -111,7 +120,7 @@
                     </div>
 
                     <div class="relative">
-                        <input id="priceBgn" type="text" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
+                        <input id="priceBgn" type="text" autocomplete="off" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
                             border border-gray-500 rounded-md outline-none
                             focus:border-orange-400 disabled:opacity-50 placeholder-transparent"
                             placeholder="Цена в лева">
@@ -130,7 +139,7 @@
                 <div id="paymentInputs" class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                     <div class="relative">
-                        <input id="paidEur" type="text" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
+                        <input id="paidEur" type="text" autocomplete="off" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
                             border border-gray-500 rounded-md outline-none
                             focus:border-orange-400 placeholder-transparent" placeholder="Платено в евро (€)">
                         <label for="paidEur" class="absolute left-3 -top-2.5 px-1 bg-slate-700 dark:bg-gray-100
@@ -143,7 +152,7 @@
                     </div>
 
                     <div class="relative">
-                        <input id="paidBgn" type="text" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
+                        <input id="paidBgn" type="text" autocomplete="off" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
                             border border-gray-500 rounded-md outline-none
                             focus:border-orange-400 placeholder-transparent" placeholder="Платено в лева">
                         <label for="paidBgn" class="absolute left-3 -top-2.5 px-1 bg-slate-700 dark:bg-gray-100
@@ -162,7 +171,7 @@
                     class="invisible opacity-0 grid grid-cols-1 md:grid-cols-2 gap-6 transition-all duration-500 ease-in-expo">
 
                     <div class="relative">
-                        <input id="changeEur" type="text" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
+                        <input id="changeEur" type="text" autocomplete="off" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
                             border border-gray-500 rounded-md outline-none
                             focus:border-orange-400 placeholder-transparent" placeholder="Ресто в евро (€)">
                         <label for="changeEur" class="absolute left-3 -top-2.5 px-1 bg-slate-700 dark:bg-gray-100
@@ -175,7 +184,7 @@
                     </div>
 
                     <div class="relative">
-                        <input id="changeBgn" type="text" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
+                        <input id="changeBgn" type="text" autocomplete="off" class="peer w-full px-3 py-3 bg-transparent text-white dark:text-gray-800
                             border border-gray-500 rounded-md outline-none
                             focus:border-orange-400 placeholder-transparent" placeholder="Ресто в лева">
                         <label for="changeBgn" class="absolute left-3 -top-2.5 px-1 bg-slate-700 dark:bg-gray-100
@@ -186,9 +195,7 @@
                             Ресто в лева
                         </label>
                     </div>
-
                 </div>
-
             </div>
 
             <!-- KEYBOARD -->

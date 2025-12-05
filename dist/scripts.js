@@ -47,7 +47,8 @@
         resetCalc: document.getElementById("resetCalc"),
         numpad: document.getElementById("numpad"),
         toggleNumpad: document.getElementById("toggleNumpad"),
-        messageIcon: document.getElementById("messageIcon")
+        messageIcon: document.getElementById("messageIcon"),
+        resultsLine: document.getElementById("resultsLine")
       };
       store = {
         mode: "payment",
@@ -61,12 +62,81 @@
           changeEur: null,
           changeBgn: null
         },
+        activeInput: null,
         validation: {
           priceValid: false,
           paidValid: false,
           changeValid: false
         }
       };
+    }
+  });
+
+  // src/scripts/calculations.js
+  function getUnifiedValue(eurField, bgnField) {
+    const eurRaw = store.inputs[eurField];
+    const bgnRaw = store.inputs[bgnField];
+    const eur = eurRaw ? parseFloat(eurRaw.replace(",", ".")) : NaN;
+    const bgn = bgnRaw ? parseFloat(bgnRaw.replace(",", ".")) : NaN;
+    if (!isNaN(eur)) return eur;
+    if (!isNaN(bgn)) return bgn / store.rate;
+    return null;
+  }
+  function determinePaidLabel() {
+    const paidEur = parseFloat(store.inputs.paidEur);
+    const paidBgn = parseFloat(store.inputs.paidBgn);
+    if (!isNaN(paidEur)) return `${paidEur.toFixed(2)} \u0435\u0432\u0440\u043E`;
+    if (!isNaN(paidBgn)) return `${paidBgn.toFixed(2)} \u043B\u0432.`;
+    return "";
+  }
+  function calculatePayment() {
+    const price = getUnifiedValue("priceEur", "priceBgn");
+    const paid = getUnifiedValue("paidEur", "paidBgn");
+    if (price === null || paid === null) return null;
+    const remainingEUR = price - paid;
+    const remainingBGN = remainingEUR * store.rate;
+    if (remainingEUR <= 0) {
+      return { type: "warning", message: "\u041C\u043E\u043B\u044F, \u0432\u044A\u0432\u0435\u0434\u0435\u0442\u0435 \u0441\u0443\u043C\u0430 \u0437\u0430 \u043F\u043B\u0430\u0449\u0430\u043D\u0435 \u043F\u043E-\u043C\u0430\u043B\u043A\u0430 \u043E\u0442 \u043A\u0440\u0430\u0439\u043D\u0430\u0442\u0430 \u0446\u0435\u043D\u0430." };
+    }
+    return {
+      type: "result",
+      priceEUR: price,
+      priceBGN: price * store.rate,
+      paidLabel: determinePaidLabel(),
+      remainingEUR,
+      remainingBGN
+    };
+  }
+  function calculateChange() {
+    const price = getUnifiedValue("priceEur", "priceBgn");
+    if (price === null) return null;
+    let paidEur = parseFloat(store.inputs.paidEur);
+    let paidBgn = parseFloat(store.inputs.paidBgn);
+    if (isNaN(paidEur)) paidEur = null;
+    if (isNaN(paidBgn)) paidBgn = null;
+    if (paidEur === null && paidBgn === null) return null;
+    let totalPaidEUR = 0;
+    if (paidEur !== null) totalPaidEUR += paidEur;
+    if (paidBgn !== null) totalPaidEUR += paidBgn / store.rate;
+    const diffEUR = totalPaidEUR - price;
+    const diffBGN = diffEUR * store.rate;
+    if (diffEUR < 0) {
+      return { type: "warning", message: "\u0412\u043D\u0438\u043C\u0430\u043D\u0438\u0435! \u041F\u043E\u043B\u0443\u0447\u0435\u043D\u0430\u0442\u0430 \u0441\u0443\u043C\u0430 \u0435 \u043F\u043E-\u043C\u0430\u043B\u043A\u0430 \u043E\u0442 \u0446\u0435\u043D\u0430\u0442\u0430." };
+    }
+    return {
+      type: "change",
+      priceEUR: price,
+      priceBGN: price * store.rate,
+      paidEur,
+      paidBgn,
+      totalChangeEUR: diffEUR,
+      totalChangeBGN: diffBGN,
+      showAsterisk: paidEur !== null && paidBgn !== null
+    };
+  }
+  var init_calculations = __esm({
+    "src/scripts/calculations.js"() {
+      init_variables();
     }
   });
 
@@ -100,6 +170,43 @@
     if (isNaN(number)) return;
     input.value = number.toFixed(2);
   }
+  function safeFormat(input) {
+    if (!input) return;
+    const fieldId = input.id;
+    if (store.validation[fieldId] !== true) return;
+    const n = parseFloat(input.value.replace(",", "."));
+    if (!isNaN(n)) {
+      formatCurrency(input);
+      store.inputs[fieldId] = input.value;
+    }
+  }
+  function handleChangeField(input, maxEur, maxBgn) {
+    const id = input.id;
+    const value = parseFloat(input.value.replace(",", "."));
+    const { changeEur, changeBgn } = elements;
+    if (!input.value) {
+      if (id === "changeEur") changeBgn.disabled = false;
+      if (id === "changeBgn") changeEur.disabled = false;
+      clearValidation(changeEur);
+      clearValidation(changeBgn);
+      return { valid: true, mixed: false };
+    }
+    if (id === "changeEur") changeBgn.disabled = true;
+    if (id === "changeBgn") changeEur.disabled = true;
+    if (isNaN(value)) {
+      markInvalid(input);
+      return { valid: false };
+    }
+    if (id === "changeEur" && value > maxEur || id === "changeBgn" && value > maxBgn) {
+      markInvalid(input);
+      return {
+        valid: false,
+        warning: "\u0412\u044A\u0432\u0435\u0434\u0435\u043D\u0430\u0442\u0430 \u0441\u0443\u043C\u0430 \u0435 \u043F\u043E-\u0433\u043E\u043B\u044F\u043C\u0430 \u043E\u0442 \u0434\u044A\u043B\u0436\u0438\u043C\u043E\u0442\u043E \u0440\u0435\u0441\u0442\u043E"
+      };
+    }
+    markValid(input);
+    return { valid: true, mixed: true };
+  }
   function markValid(input) {
     input.classList.remove("border-red-600", "border-gray-500");
     input.classList.add("border-lime-600");
@@ -113,25 +220,37 @@
     input.classList.add("border-gray-500");
   }
   function validateInput(input) {
-    let value = input.value.replace(",", ".");
-    const numericPattern = /^(\d+(\.\d*)?|\.\d*)$/;
     const fieldId = input.id;
-    store.inputs[fieldId] = input.value;
-    if (value === "") {
+    const raw = input.value;
+    const value = raw.replace(",", ".");
+    store.inputs[fieldId] = raw;
+    if (/[^0-9.]/.test(raw)) {
+      markInvalid(input);
+      store.validation[fieldId] = false;
+      updateResultDisplay({
+        type: "warning",
+        message: "\u041D\u0435\u0432\u0430\u043B\u0438\u0434\u043D\u0438 \u0441\u0438\u043C\u0432\u043E\u043B\u0438. \u041C\u043E\u043B\u044F, \u0432\u044A\u0432\u0435\u0434\u0435\u0442\u0435 \u0441\u0430\u043C\u043E \u0447\u0438\u0441\u043B\u0430."
+      });
+      return false;
+    }
+    if (raw === "") {
       clearValidation(input);
       store.validation[fieldId] = false;
       return false;
     }
-    if (numericPattern.test(value)) {
-      input.value = value;
-      markValid(input);
-      store.validation[fieldId] = true;
-      autoConvert(fieldId, input.value);
-      return true;
+    if ((value.match(/\./g) || []).length > 1) {
+      markInvalid(input);
+      store.validation[fieldId] = false;
+      updateResultDisplay({
+        type: "warning",
+        message: "\u041D\u0435\u0432\u0430\u043B\u0438\u0434\u0435\u043D \u0444\u043E\u0440\u043C\u0430\u0442. \u0418\u0437\u043F\u043E\u043B\u0437\u0432\u0430\u0439\u0442\u0435 \u0441\u0430\u043C\u043E \u0435\u0434\u043D\u0430 \u0434\u0435\u0441\u0435\u0442\u0438\u0447\u043D\u0430 \u0442\u043E\u0447\u043A\u0430."
+      });
+      return false;
     }
-    markInvalid(input);
-    store.validation[fieldId] = false;
-    return false;
+    markValid(input);
+    store.validation[fieldId] = true;
+    autoConvert(fieldId, value);
+    return true;
   }
   function resetInput(input) {
     if (!input) return;
@@ -157,7 +276,16 @@
     resetInput(paidBgn);
     resetInput(changeEur);
     resetInput(changeBgn);
-    if (resultsLine) resultsLine.textContent = "0.00";
+    if (resultsLine) {
+      resultsLine.classList.remove("opacity-100");
+      resultsLine.classList.add("opacity-0", "pointer-events-none");
+      resultsLine.innerHTML = "";
+    }
+    const instructions = document.getElementById("messageLine");
+    if (instructions) {
+      instructions.classList.remove("opacity-0", "pointer-events-none");
+      instructions.classList.add("opacity-100");
+    }
   }
   function initInputsListener() {
     const wrapper = document.getElementById("calcInputs");
@@ -169,37 +297,84 @@
       const input = event.target;
       if (!input.matches("input")) return;
       const valid = validateInput(input);
+      if (!valid) {
+        return;
+      }
+      let result = null;
+      if (store.mode === "payment") {
+        result = calculatePayment();
+      } else if (store.mode === "change") {
+        result = calculateChange();
+      }
+      if (store.mode === "change" && (input.id === "changeEur" || input.id === "changeBgn")) {
+        const result2 = calculateChange();
+        if (!result2 || result2.type !== "change") {
+          updateResultDisplay(result2 || null);
+          return;
+        }
+        const { maxEur, maxBgn } = result2;
+        const state = handleChangeField(input, maxEur, maxBgn);
+        if (!state.valid) {
+          updateResultDisplay({
+            type: "warning",
+            message: state.warning || "\u041D\u0435\u0432\u0430\u043B\u0438\u0434\u043D\u0430 \u0441\u0442\u043E\u0439\u043D\u043E\u0441\u0442"
+          });
+          return;
+        }
+        if (state.mixed) {
+          const partial = parseFloat(input.value.replace(",", "."));
+          if (input.id === "changeEur" && partial > result2.totalChangeEUR || input.id === "changeBgn" && partial > result2.totalChangeBGN) {
+            markInvalid(input);
+            updateResultDisplay({
+              type: "warning",
+              message: "\u0412\u043D\u0438\u043C\u0430\u043D\u0438\u0435! \u0412\u044A\u0432\u0435\u0434\u0435\u043D\u0430\u0442\u0430 \u0441\u0443\u043C\u0430 \u0437\u0430 \u0447\u0430\u0441\u0442\u0438\u0447\u043D\u043E \u0440\u0435\u0441\u0442\u043E \u0435 \u043F\u043E-\u0433\u043E\u043B\u044F\u043C\u0430 \u043E\u0442 \u0446\u044F\u043B\u0430\u0442\u0430 \u0441\u0442\u043E\u0439\u043D\u043E\u0441\u0442 \u043D\u0430 \u0440\u0435\u0441\u0442\u043E\u0442\u043E."
+            });
+            return;
+          }
+          let mixedEur, mixedBgn;
+          if (input.id === "changeEur") {
+            mixedEur = partial;
+            mixedBgn = (result2.totalChangeEUR - partial) * store.rate;
+          } else {
+            mixedBgn = partial;
+            mixedEur = (result2.totalChangeBGN - partial) / store.rate;
+          }
+          result2.hasMixed = true;
+          result2.mixedEur = mixedEur;
+          result2.mixedBgn = mixedBgn;
+        }
+        updateResultDisplay(result2);
+        return;
+      }
+      updateResultDisplay(result);
       document.dispatchEvent(
         new CustomEvent("show-notification", {
           detail: { type: valid ? "success" : "error", fieldId: input.id }
         })
       );
     });
-    wrapper.addEventListener(
-      "blur",
-      (event) => {
-        const input = event.target;
-        if (!input.matches("input")) return;
-        const valid = validateInput(input);
-        if (valid) {
-          formatCurrency(input);
+    wrapper.addEventListener("focusin", (event) => {
+      const input = event.target;
+      if (input.matches("input")) {
+        if (store.activeInput && store.activeInput !== input) {
+          safeFormat(store.activeInput);
         }
-        if (input.closest("#priceInputs")) {
-          if (input.id === "priceEur") resetInput(elements.priceBgn);
-          if (input.id === "priceBgn") resetInput(elements.priceEur);
-        }
-        document.dispatchEvent(
-          new CustomEvent("show-notification", {
-            detail: { type: valid ? "success" : "error", fieldId: input.id }
-          })
-        );
-      },
-      false
-    );
+        store.activeInput = input;
+      }
+    });
+    document.addEventListener("click", (event) => {
+      const active = store.activeInput;
+      if (!active) return;
+      if (event.target === active || active.contains(event.target)) return;
+      if (event.target.closest("#numpad")) return;
+      safeFormat(active);
+    });
   }
   var init_inputs_handling = __esm({
     "src/scripts/inputs-handling.js"() {
       init_variables();
+      init_calculations();
+      init_calc_interface();
     }
   });
 
@@ -224,7 +399,7 @@
       const indicator = document.createElement("span");
       indicator.className = `
             check-indicator inline-block
-            w-3 h-3 rounded-full border border-current
+            size-3 rounded-full border border-current
             opacity-50
         `;
       li.appendChild(indicator);
@@ -233,26 +408,24 @@
     });
   }
   function setIndicatorIdle(el) {
-    el.className = `
-        check-indicator inline-block w-3 h-3 rounded-full 
-        border border-current opacity-50
-    `;
+    el.innerHTML = "";
+    el.className = `check-indicator inline-block size-3 rounded-full border border-current opacity-50`;
   }
   function setIndicatorSuccess(el) {
     el.className = `
         check-indicator inline-flex items-center justify-center 
-        w-3 h-3 rounded-full bg-lime-500 text-white
+        size-3 rounded-full bg-lime-500 text-white
     `;
     el.innerHTML = `<i class="fa-solid fa-check text-[8px] leading-none"></i>`;
   }
   function setIndicatorError(el) {
     el.className = `
         check-indicator relative inline-flex items-center justify-center 
-        w-3 h-3 rounded-full bg-red-600
+        size-3 rounded-full bg-red-600
     `;
     el.innerHTML = `
-        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75"></span>
-        <span class="relative block w-3 h-3 rounded-full bg-red-600"></span>
+        <span class="absolute inline-flex size-full animate-ping rounded-full bg-red-500 opacity-75"></span>
+        <span class="relative block size-3 rounded-full bg-red-600"></span>
     `;
   }
   function initInputFeedback() {
@@ -332,6 +505,11 @@
   }
   function initKeypadToggle() {
     const { toggleNumpad, numpad } = elements;
+    numpad.addEventListener("mousedown", (event) => {
+      const btn = event.target.closest("button");
+      if (!btn) return;
+      event.preventDefault();
+    });
     toggleNumpad.addEventListener("click", () => {
       const isPaymentMode = store.mode === "payment";
       if (numpad.classList.contains("keyboard-on")) {
@@ -359,6 +537,160 @@
       updateDisplayText();
     });
   }
+  function initKeypadInput() {
+    const { numpad } = elements;
+    if (!numpad) return;
+    numpad.addEventListener("click", (event) => {
+      const btn = event.target.closest("button");
+      if (!btn) return;
+      if (!store.activeInput) return;
+      const input = store.activeInput;
+      const value = btn.textContent.trim();
+      if (btn.querySelector(".fa-trash")) {
+        input.value = input.value.slice(0, -1);
+      } else if (btn.querySelector(".fa-rotate-left")) {
+        input.value = "";
+      } else {
+        input.value += value;
+      }
+      input.focus();
+      store.inputs[input.id] = input.value;
+      const valid = validateInput(input);
+      document.dispatchEvent(new CustomEvent("show-notification", {
+        detail: { type: valid ? "success" : "error", fieldId: input.id }
+      }));
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+  }
+  function updateResultDisplay(result) {
+    const instructions = document.getElementById("messageLine");
+    const results = elements.resultsLine;
+    if (!instructions || !results) return;
+    if (!result) {
+      instructions.classList.remove("opacity-0", "pointer-events-none");
+      instructions.classList.add("opacity-100");
+      results.classList.remove("opacity-100");
+      results.classList.add("opacity-0", "pointer-events-none");
+      results.innerHTML = "";
+      return;
+    }
+    instructions.classList.remove("opacity-100");
+    instructions.classList.add("opacity-0", "pointer-events-none");
+    results.classList.remove("opacity-0", "pointer-events-none");
+    results.classList.add("opacity-100");
+    if (result.type === "warning") {
+      results.innerHTML = `
+        <div class="flex items-center gap-2 text-yellow-400 font-semibold text-base">
+            <span class="relative size-3 inline-flex items-center justify-center">
+                <span class="absolute size-3 rounded-full bg-red-500 opacity-75 animate-ping"></span>
+                <span class="relative size-3 rounded-full bg-red-600"></span>
+            </span>
+            ${result.message}
+        </div>`;
+      return;
+    }
+    if (result.type === "change") {
+      let totalPaidEUR = 0;
+      if (result.paidEur !== null) totalPaidEUR += result.paidEur;
+      if (result.paidBgn !== null) totalPaidEUR += result.paidBgn / store.rate;
+      let totalPaidBGN = totalPaidEUR * store.rate;
+      const receivedLine = `
+        \u041F\u043E\u043B\u0443\u0447\u0435\u043D\u0438:
+        <span class="ml-2 font-bold text-blue-300">
+            ${totalPaidEUR.toFixed(2)} \u0435\u0432\u0440\u043E
+        </span>
+        <span class="ml-2">
+            ( = <span class="font-bold text-orange-400">${totalPaidBGN.toFixed(2)} \u043B\u0432.</span> )
+        </span>
+    `;
+      const priceLine = `
+        \u0426\u0435\u043D\u0430:
+        <span class="ml-2 font-bold text-blue-300">
+            ${result.priceEUR.toFixed(2)} \u0435\u0432\u0440\u043E
+        </span>
+        <span class="ml-2">
+            ( = <span class="font-bold text-orange-400">${result.priceBGN.toFixed(2)} \u043B\u0432.</span> )
+        </span>
+    `;
+      let changeLine = "";
+      if (result.hasMixed) {
+        changeLine = `
+            \u0420\u0435\u0441\u0442\u043E: 
+            <span class="ml-2 font-bold text-blue-300">
+                ${result.mixedEur.toFixed(2)} \u0435\u0432\u0440\u043E
+            </span>
+            \u0438
+            <span class="ml-1 font-bold text-orange-400">
+                ${result.mixedBgn.toFixed(2)} \u043B\u0432.
+            </span>
+            <span class="align-top text-red-500 font-bold">*</span>
+        `;
+      } else {
+        changeLine = `
+            \u0420\u0435\u0441\u0442\u043E: 
+            <span class="ml-2 font-bold text-blue-300">
+                ${Math.abs(result.totalChangeEUR).toFixed(2)} \u0435\u0432\u0440\u043E
+            </span>
+            ( \u0438\u043B\u0438 
+            <span class="font-bold text-orange-400">
+                ${Math.abs(result.totalChangeBGN).toFixed(2)} \u043B\u0432.
+            </span>
+            )
+            <span class="align-top text-red-500 font-bold">*</span>
+        `;
+      }
+      results.innerHTML = `
+        <div class="text-sm">
+            ${priceLine}
+        </div>
+
+        <div class="text-sm">
+            ${receivedLine}
+        </div>
+
+        <div class="text-sm">
+            ${changeLine}
+        </div>
+        <div class="text-xs mt-1 text-gray-300 tracking-widest font-bold">
+                    <span class="font-bold text-red-500">*</span>
+                    \u0417\u0430 \u0441\u043C\u0435\u0441\u0435\u043D\u043E \u0440\u0435\u0441\u0442\u043E \u0438\u0437\u043F\u043E\u043B\u0437\u0432\u0430\u0439\u0442\u0435 \u043F\u043E\u0441\u043B\u0435\u0434\u043D\u0438\u0442\u0435 \u0434\u0432\u0435 \u043F\u043E\u043B\u0435\u0442\u0430
+                   </div>
+    `;
+      return;
+    }
+    const paidIsEUR = result.paidLabel.includes("\u0435\u0432\u0440\u043E");
+    results.innerHTML = `
+        <div class="text-sm">
+            \u0426\u0435\u043D\u0430:
+            <span class="ml-2 mr-1 font-bold text-blue-300">
+                <span class="text-base text-shadow-lg">${result.priceEUR.toFixed(2)}</span> \u0435\u0432\u0440\u043E
+            </span>
+            ( = 
+            <span class="ml-1 font-bold text-orange-400">
+                <span class="text-base text-shadow-lg">${result.priceBGN.toFixed(2)}</span> \u043B\u0432.
+            </span>
+            )
+        </div>
+
+        <div class="text-sm">
+            \u041F\u043B\u0430\u0442\u0435\u043D\u0438 \u0434\u043E \u043C\u043E\u043C\u0435\u043D\u0442\u0430:
+            <span class="ml-2 font-bold ${paidIsEUR ? "text-blue-300" : "text-orange-400"}">
+                <span class="text-base text-shadow-lg">${result.paidLabel}</span>
+            </span>
+        </div>
+
+        <div class="text-sm">
+            \u041E\u0441\u0442\u0430\u0432\u0430\u0442 \u0437\u0430 \u0434\u043E\u043F\u043B\u0430\u0449\u0430\u043D\u0435:
+            <span class="ml-2 mr-1 font-bold text-blue-300">
+                <span class="text-base text-shadow-lg">${result.remainingEUR.toFixed(2)}</span> \u0435\u0432\u0440\u043E
+            </span>
+            \u0438\u043B\u0438
+            <span class="ml-1 font-bold text-orange-400">
+                <span class="text-base text-shadow-lg">${result.remainingBGN.toFixed(2)}</span> \u043B\u0432.
+            </span>
+        </div>
+    `;
+  }
   var init_calc_interface = __esm({
     "src/scripts/calc-interface.js"() {
       init_variables();
@@ -379,6 +711,7 @@
         initInputsListener();
         initKeypadToggle();
         initResetButton();
+        initKeypadInput();
       });
     }
   });
