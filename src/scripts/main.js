@@ -1,4 +1,4 @@
-import { initThemeSwitch } from "./utils.js";
+import { initURLLoader, initThemeSwitch } from "./utils.js";
 import { initModeSwitch, initKeypadToggle, initResetButton, initInputFeedback, initKeypadInput } from "./calc-interface.js";
 import { initInputsListener } from "./inputs-handling.js";
 
@@ -10,4 +10,5 @@ document.addEventListener("DOMContentLoaded", () => {
     initKeypadToggle();
     initResetButton();
     initKeypadInput();
+    initURLLoader();
 });

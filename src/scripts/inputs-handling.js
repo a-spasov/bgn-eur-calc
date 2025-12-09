@@ -220,14 +220,14 @@ function initInputsListener() {
 
         const valid = validateInput(input);
 
-// ❗ STOP everything if invalid input
-if (!valid) {
-    // Show nothing except the error message already set
-    return;
-}
+        // ❗ STOP everything if invalid input
+        if (!valid) {
+            // Show nothing except the error message already set
+            return;
+        }
 
-// Now it's safe to continue
-let result = null;
+        // Now it's safe to continue
+        let result = null;
 
         if (store.mode === "payment") {
             result = calculatePayment();
@@ -258,37 +258,37 @@ let result = null;
             }
 
             if (state.mixed) {
-    const partial = parseFloat(input.value.replace(",", "."));
+                const partial = parseFloat(input.value.replace(",", "."));
 
-    // VALIDATION: partial > total change?
-    if (
-        (input.id === "changeEur" && partial > result.totalChangeEUR) ||
-        (input.id === "changeBgn" && partial > result.totalChangeBGN)
-    ) {
-        markInvalid(input);
+                // VALIDATION: partial > total change?
+                if (
+                    (input.id === "changeEur" && partial > result.totalChangeEUR) ||
+                    (input.id === "changeBgn" && partial > result.totalChangeBGN)
+                ) {
+                    markInvalid(input);
 
-        updateResultDisplay({
-            type: "warning",
-            message: "Внимание! Въведената сума за частично ресто е по-голяма от цялата стойност на рестото."
-        });
+                    updateResultDisplay({
+                        type: "warning",
+                        message: "Внимание! Въведената сума за частично ресто е по-голяма от цялата стойност на рестото."
+                    });
 
-        return;
-    }
+                    return;
+                }
 
-    let mixedEur, mixedBgn;
+                let mixedEur, mixedBgn;
 
-    if (input.id === "changeEur") {
-        mixedEur = partial;
-        mixedBgn = (result.totalChangeEUR - partial) * store.rate;
-    } else {
-        mixedBgn = partial;
-        mixedEur = (result.totalChangeBGN - partial) / store.rate;
-    }
+                if (input.id === "changeEur") {
+                    mixedEur = partial;
+                    mixedBgn = (result.totalChangeEUR - partial) * store.rate;
+                } else {
+                    mixedBgn = partial;
+                    mixedEur = (result.totalChangeBGN - partial) / store.rate;
+                }
 
-    result.hasMixed = true;
-    result.mixedEur = mixedEur;
-    result.mixedBgn = mixedBgn;
-}
+                result.hasMixed = true;
+                result.mixedEur = mixedEur;
+                result.mixedBgn = mixedBgn;
+            }
 
 
             updateResultDisplay(result);
