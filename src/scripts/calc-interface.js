@@ -207,6 +207,11 @@ function initResetButton() {
     resetCalc.addEventListener("click", () => {
         resetAll();
         updateDisplayText();
+
+        if (window.history && window.history.replaceState) {
+            const cleanURL = window.location.pathname;
+            window.history.replaceState({}, "", cleanURL);
+        }
     });
 }
 

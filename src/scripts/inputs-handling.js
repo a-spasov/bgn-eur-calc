@@ -134,10 +134,17 @@ function validateInput(input) {
 
     // Empty input resets validation
     if (raw === "") {
-        clearValidation(input);
-        store.validation[fieldId] = false;
-        return false;
+    clearValidation(input);
+    store.validation[fieldId] = false;
+
+    // allow empty for change fields
+    if (fieldId === "changeEur" || fieldId === "changeBgn") {
+        store.inputs[fieldId] = "";
+        return "empty";
     }
+
+    return false;
+}  
 
     // 2) Validate numeric structure (only one dot allowed)
     if ((value.match(/\./g) || []).length > 1) {
@@ -220,11 +227,26 @@ function initInputsListener() {
 
         const valid = validateInput(input);
 
-        // ❗ STOP everything if invalid input
-        if (!valid) {
-            // Show nothing except the error message already set
+        // CASE: change input becomes empty
+        if (valid === "empty") {
+
+            if (store.mode === "change" && 
+                (input.id === "changeEur" || input.id === "changeBgn")) {
+
+                // Re-enable the opposite input
+                if (input.id === "changeEur") elements.changeBgn.disabled = false;
+                if (input.id === "changeBgn") elements.changeEur.disabled = false;
+
+                // Show full original change
+                const base = calculateChange();
+                updateResultDisplay(base);
+            }
+
             return;
         }
+
+        // Stop only on truly invalid input
+        if (!valid) return;
 
         // Now it's safe to continue
         let result = null;
@@ -257,39 +279,45 @@ function initInputsListener() {
                 return;
             }
 
-            if (state.mixed) {
-                const partial = parseFloat(input.value.replace(",", "."));
+        // If input is empty → show full standard change again
+        if (!input.value) {
+            updateResultDisplay(result); // original full change
+            return;
+        }
 
-                // VALIDATION: partial > total change?
-                if (
-                    (input.id === "changeEur" && partial > result.totalChangeEUR) ||
-                    (input.id === "changeBgn" && partial > result.totalChangeBGN)
-                ) {
-                    markInvalid(input);
+        // If mixed change was entered
+        if (state.mixed) {
+            const partial = parseFloat(input.value.replace(",", "."));
 
-                    updateResultDisplay({
-                        type: "warning",
-                        message: "Внимание! Въведената сума за частично ресто е по-голяма от цялата стойност на рестото."
-                    });
-
-                    return;
-                }
-
-                let mixedEur, mixedBgn;
-
-                if (input.id === "changeEur") {
-                    mixedEur = partial;
-                    mixedBgn = (result.totalChangeEUR - partial) * store.rate;
-                } else {
-                    mixedBgn = partial;
-                    mixedEur = (result.totalChangeBGN - partial) / store.rate;
-                }
-
-                result.hasMixed = true;
-                result.mixedEur = mixedEur;
-                result.mixedBgn = mixedBgn;
+            if (
+                (input.id === "changeEur" && partial > result.totalChangeEUR) ||
+                (input.id === "changeBgn" && partial > result.totalChangeBGN)
+            ) {
+                markInvalid(input);
+                updateResultDisplay({
+                    type: "warning",
+                    message: "Внимание! Въведената сума за частично ресто е по-голяма от цялата стойност на рестото."
+                });
+                return;
             }
 
+            let mixedEur, mixedBgn;
+
+            if (input.id === "changeEur") {
+                mixedEur = partial;
+                mixedBgn = (result.totalChangeEUR - partial) * store.rate;
+            } else {
+                mixedBgn = partial;
+                mixedEur = (result.totalChangeBGN - partial) / store.rate;
+            }
+
+            result.hasMixed = true;
+            result.mixedEur = mixedEur;
+            result.mixedBgn = mixedBgn;
+
+            updateResultDisplay(result);
+            return;
+        }
 
             updateResultDisplay(result);
             return;
