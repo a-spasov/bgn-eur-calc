@@ -7,26 +7,6 @@
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
 
-  // src/scripts/utils.js
-  function initThemeSwitch() {
-    document.getElementById("themeToggle").addEventListener("click", () => {
-      const html = document.documentElement;
-      html.classList.toggle("dark");
-      if (html.classList.contains("dark")) {
-        localStorage.setItem("theme", "dark");
-      } else {
-        localStorage.setItem("theme", "light");
-      }
-    });
-    if (localStorage.getItem("theme") === "dark") {
-      document.documentElement.classList.add("dark");
-    }
-  }
-  var init_utils = __esm({
-    "src/scripts/utils.js"() {
-    }
-  });
-
   // src/scripts/variables.js
   var elements, store;
   var init_variables = __esm({
@@ -137,244 +117,6 @@
   var init_calculations = __esm({
     "src/scripts/calculations.js"() {
       init_variables();
-    }
-  });
-
-  // src/scripts/inputs-handling.js
-  function autoConvert(fieldId, rawValue) {
-    const value = parseFloat(rawValue);
-    if (isNaN(value)) return;
-    const { priceEur, priceBgn } = elements;
-    switch (fieldId) {
-      case "priceEur":
-        priceBgn.value = (value * store.rate).toFixed(2);
-        markValid(priceBgn);
-        priceBgn.disabled = true;
-        store.inputs.priceBgn = priceBgn.value;
-        store.validation.priceBgn = true;
-        break;
-      case "priceBgn":
-        priceEur.value = (value / store.rate).toFixed(2);
-        markValid(priceEur);
-        priceEur.disabled = true;
-        store.inputs.priceEur = priceEur.value;
-        store.validation.priceEur = true;
-        break;
-      default:
-        return;
-    }
-  }
-  function formatCurrency(input) {
-    if (input.value === "") return;
-    const number = parseFloat(input.value.replace(",", "."));
-    if (isNaN(number)) return;
-    input.value = number.toFixed(2);
-  }
-  function safeFormat(input) {
-    if (!input) return;
-    const fieldId = input.id;
-    if (store.validation[fieldId] !== true) return;
-    const n = parseFloat(input.value.replace(",", "."));
-    if (!isNaN(n)) {
-      formatCurrency(input);
-      store.inputs[fieldId] = input.value;
-    }
-  }
-  function handleChangeField(input, maxEur, maxBgn) {
-    const id = input.id;
-    const value = parseFloat(input.value.replace(",", "."));
-    const { changeEur, changeBgn } = elements;
-    if (!input.value) {
-      if (id === "changeEur") changeBgn.disabled = false;
-      if (id === "changeBgn") changeEur.disabled = false;
-      clearValidation(changeEur);
-      clearValidation(changeBgn);
-      return { valid: true, mixed: false };
-    }
-    if (id === "changeEur") changeBgn.disabled = true;
-    if (id === "changeBgn") changeEur.disabled = true;
-    if (isNaN(value)) {
-      markInvalid(input);
-      return { valid: false };
-    }
-    if (id === "changeEur" && value > maxEur || id === "changeBgn" && value > maxBgn) {
-      markInvalid(input);
-      return {
-        valid: false,
-        warning: "\u0412\u044A\u0432\u0435\u0434\u0435\u043D\u0430\u0442\u0430 \u0441\u0443\u043C\u0430 \u0435 \u043F\u043E-\u0433\u043E\u043B\u044F\u043C\u0430 \u043E\u0442 \u0434\u044A\u043B\u0436\u0438\u043C\u043E\u0442\u043E \u0440\u0435\u0441\u0442\u043E"
-      };
-    }
-    markValid(input);
-    return { valid: true, mixed: true };
-  }
-  function markValid(input) {
-    input.classList.remove("border-red-600", "border-gray-500");
-    input.classList.add("border-lime-600");
-  }
-  function markInvalid(input) {
-    input.classList.remove("border-lime-600", "border-gray-500");
-    input.classList.add("border-red-600");
-  }
-  function clearValidation(input) {
-    input.classList.remove("border-lime-600", "border-red-600");
-    input.classList.add("border-gray-500");
-  }
-  function validateInput(input) {
-    const fieldId = input.id;
-    const raw = input.value;
-    const value = raw.replace(",", ".");
-    store.inputs[fieldId] = raw;
-    if (/[^0-9.]/.test(raw)) {
-      markInvalid(input);
-      store.validation[fieldId] = false;
-      updateResultDisplay({
-        type: "warning",
-        message: "\u041D\u0435\u0432\u0430\u043B\u0438\u0434\u043D\u0438 \u0441\u0438\u043C\u0432\u043E\u043B\u0438. \u041C\u043E\u043B\u044F, \u0432\u044A\u0432\u0435\u0434\u0435\u0442\u0435 \u0441\u0430\u043C\u043E \u0447\u0438\u0441\u043B\u0430."
-      });
-      return false;
-    }
-    if (raw === "") {
-      clearValidation(input);
-      store.validation[fieldId] = false;
-      return false;
-    }
-    if ((value.match(/\./g) || []).length > 1) {
-      markInvalid(input);
-      store.validation[fieldId] = false;
-      updateResultDisplay({
-        type: "warning",
-        message: "\u041D\u0435\u0432\u0430\u043B\u0438\u0434\u0435\u043D \u0444\u043E\u0440\u043C\u0430\u0442. \u0418\u0437\u043F\u043E\u043B\u0437\u0432\u0430\u0439\u0442\u0435 \u0441\u0430\u043C\u043E \u0435\u0434\u043D\u0430 \u0434\u0435\u0441\u0435\u0442\u0438\u0447\u043D\u0430 \u0442\u043E\u0447\u043A\u0430."
-      });
-      return false;
-    }
-    markValid(input);
-    store.validation[fieldId] = true;
-    autoConvert(fieldId, value);
-    return true;
-  }
-  function resetInput(input) {
-    if (!input) return;
-    input.value = "";
-    input.disabled = false;
-    clearValidation(input);
-    store.inputs[input.id] = "";
-    store.validation[input.id] = false;
-  }
-  function resetAll() {
-    const {
-      priceEur,
-      priceBgn,
-      paidEur,
-      paidBgn,
-      changeEur,
-      changeBgn,
-      resultsLine
-    } = elements;
-    resetInput(priceEur);
-    resetInput(priceBgn);
-    resetInput(paidEur);
-    resetInput(paidBgn);
-    resetInput(changeEur);
-    resetInput(changeBgn);
-    if (resultsLine) {
-      resultsLine.classList.remove("opacity-100");
-      resultsLine.classList.add("opacity-0", "pointer-events-none");
-      resultsLine.innerHTML = "";
-    }
-    const instructions = document.getElementById("messageLine");
-    if (instructions) {
-      instructions.classList.remove("opacity-0", "pointer-events-none");
-      instructions.classList.add("opacity-100");
-    }
-  }
-  function initInputsListener() {
-    const wrapper = document.getElementById("calcInputs");
-    if (!wrapper) {
-      console.warn("calcInputs wrapper not found");
-      return;
-    }
-    wrapper.addEventListener("input", (event) => {
-      const input = event.target;
-      if (!input.matches("input")) return;
-      const valid = validateInput(input);
-      if (!valid) {
-        return;
-      }
-      let result = null;
-      if (store.mode === "payment") {
-        result = calculatePayment();
-      } else if (store.mode === "change") {
-        result = calculateChange();
-      }
-      if (store.mode === "change" && (input.id === "changeEur" || input.id === "changeBgn")) {
-        const result2 = calculateChange();
-        if (!result2 || result2.type !== "change") {
-          updateResultDisplay(result2 || null);
-          return;
-        }
-        const { maxEur, maxBgn } = result2;
-        const state = handleChangeField(input, maxEur, maxBgn);
-        if (!state.valid) {
-          updateResultDisplay({
-            type: "warning",
-            message: state.warning || "\u041D\u0435\u0432\u0430\u043B\u0438\u0434\u043D\u0430 \u0441\u0442\u043E\u0439\u043D\u043E\u0441\u0442"
-          });
-          return;
-        }
-        if (state.mixed) {
-          const partial = parseFloat(input.value.replace(",", "."));
-          if (input.id === "changeEur" && partial > result2.totalChangeEUR || input.id === "changeBgn" && partial > result2.totalChangeBGN) {
-            markInvalid(input);
-            updateResultDisplay({
-              type: "warning",
-              message: "\u0412\u043D\u0438\u043C\u0430\u043D\u0438\u0435! \u0412\u044A\u0432\u0435\u0434\u0435\u043D\u0430\u0442\u0430 \u0441\u0443\u043C\u0430 \u0437\u0430 \u0447\u0430\u0441\u0442\u0438\u0447\u043D\u043E \u0440\u0435\u0441\u0442\u043E \u0435 \u043F\u043E-\u0433\u043E\u043B\u044F\u043C\u0430 \u043E\u0442 \u0446\u044F\u043B\u0430\u0442\u0430 \u0441\u0442\u043E\u0439\u043D\u043E\u0441\u0442 \u043D\u0430 \u0440\u0435\u0441\u0442\u043E\u0442\u043E."
-            });
-            return;
-          }
-          let mixedEur, mixedBgn;
-          if (input.id === "changeEur") {
-            mixedEur = partial;
-            mixedBgn = (result2.totalChangeEUR - partial) * store.rate;
-          } else {
-            mixedBgn = partial;
-            mixedEur = (result2.totalChangeBGN - partial) / store.rate;
-          }
-          result2.hasMixed = true;
-          result2.mixedEur = mixedEur;
-          result2.mixedBgn = mixedBgn;
-        }
-        updateResultDisplay(result2);
-        return;
-      }
-      updateResultDisplay(result);
-      document.dispatchEvent(
-        new CustomEvent("show-notification", {
-          detail: { type: valid ? "success" : "error", fieldId: input.id }
-        })
-      );
-    });
-    wrapper.addEventListener("focusin", (event) => {
-      const input = event.target;
-      if (input.matches("input")) {
-        if (store.activeInput && store.activeInput !== input) {
-          safeFormat(store.activeInput);
-        }
-        store.activeInput = input;
-      }
-    });
-    document.addEventListener("click", (event) => {
-      const active = store.activeInput;
-      if (!active) return;
-      if (event.target === active || active.contains(event.target)) return;
-      if (event.target.closest("#numpad")) return;
-      safeFormat(active);
-    });
-  }
-  var init_inputs_handling = __esm({
-    "src/scripts/inputs-handling.js"() {
-      init_variables();
-      init_calculations();
-      init_calc_interface();
     }
   });
 
@@ -535,6 +277,10 @@
     resetCalc.addEventListener("click", () => {
       resetAll();
       updateDisplayText();
+      if (window.history && window.history.replaceState) {
+        const cleanURL = window.location.pathname;
+        window.history.replaceState({}, "", cleanURL);
+      }
     });
   }
   function initKeypadInput() {
@@ -698,6 +444,308 @@
     }
   });
 
+  // src/scripts/inputs-handling.js
+  function autoConvert(fieldId, rawValue) {
+    const value = parseFloat(rawValue);
+    if (isNaN(value)) return;
+    const { priceEur, priceBgn } = elements;
+    switch (fieldId) {
+      case "priceEur":
+        priceBgn.value = (value * store.rate).toFixed(2);
+        markValid(priceBgn);
+        priceBgn.disabled = true;
+        store.inputs.priceBgn = priceBgn.value;
+        store.validation.priceBgn = true;
+        break;
+      case "priceBgn":
+        priceEur.value = (value / store.rate).toFixed(2);
+        markValid(priceEur);
+        priceEur.disabled = true;
+        store.inputs.priceEur = priceEur.value;
+        store.validation.priceEur = true;
+        break;
+      default:
+        return;
+    }
+  }
+  function formatCurrency(input) {
+    if (input.value === "") return;
+    const number = parseFloat(input.value.replace(",", "."));
+    if (isNaN(number)) return;
+    input.value = number.toFixed(2);
+  }
+  function safeFormat(input) {
+    if (!input) return;
+    const fieldId = input.id;
+    if (store.validation[fieldId] !== true) return;
+    const n = parseFloat(input.value.replace(",", "."));
+    if (!isNaN(n)) {
+      formatCurrency(input);
+      store.inputs[fieldId] = input.value;
+    }
+  }
+  function handleChangeField(input, maxEur, maxBgn) {
+    const id = input.id;
+    const value = parseFloat(input.value.replace(",", "."));
+    const { changeEur, changeBgn } = elements;
+    if (!input.value) {
+      if (id === "changeEur") changeBgn.disabled = false;
+      if (id === "changeBgn") changeEur.disabled = false;
+      clearValidation(changeEur);
+      clearValidation(changeBgn);
+      return { valid: true, mixed: false };
+    }
+    if (id === "changeEur") changeBgn.disabled = true;
+    if (id === "changeBgn") changeEur.disabled = true;
+    if (isNaN(value)) {
+      markInvalid(input);
+      return { valid: false };
+    }
+    if (id === "changeEur" && value > maxEur || id === "changeBgn" && value > maxBgn) {
+      markInvalid(input);
+      return {
+        valid: false,
+        warning: "\u0412\u044A\u0432\u0435\u0434\u0435\u043D\u0430\u0442\u0430 \u0441\u0443\u043C\u0430 \u0435 \u043F\u043E-\u0433\u043E\u043B\u044F\u043C\u0430 \u043E\u0442 \u0434\u044A\u043B\u0436\u0438\u043C\u043E\u0442\u043E \u0440\u0435\u0441\u0442\u043E"
+      };
+    }
+    markValid(input);
+    return { valid: true, mixed: true };
+  }
+  function markValid(input) {
+    input.classList.remove("border-red-600", "border-gray-500");
+    input.classList.add("border-lime-600");
+  }
+  function markInvalid(input) {
+    input.classList.remove("border-lime-600", "border-gray-500");
+    input.classList.add("border-red-600");
+  }
+  function clearValidation(input) {
+    input.classList.remove("border-lime-600", "border-red-600");
+    input.classList.add("border-gray-500");
+  }
+  function validateInput(input) {
+    const fieldId = input.id;
+    const raw = input.value;
+    const value = raw.replace(",", ".");
+    store.inputs[fieldId] = raw;
+    if (/[^0-9.]/.test(raw)) {
+      markInvalid(input);
+      store.validation[fieldId] = false;
+      updateResultDisplay({
+        type: "warning",
+        message: "\u041D\u0435\u0432\u0430\u043B\u0438\u0434\u043D\u0438 \u0441\u0438\u043C\u0432\u043E\u043B\u0438. \u041C\u043E\u043B\u044F, \u0432\u044A\u0432\u0435\u0434\u0435\u0442\u0435 \u0441\u0430\u043C\u043E \u0447\u0438\u0441\u043B\u0430."
+      });
+      return false;
+    }
+    if (raw === "") {
+      clearValidation(input);
+      store.validation[fieldId] = false;
+      if (fieldId === "changeEur" || fieldId === "changeBgn") {
+        store.inputs[fieldId] = "";
+        return "empty";
+      }
+      return false;
+    }
+    if ((value.match(/\./g) || []).length > 1) {
+      markInvalid(input);
+      store.validation[fieldId] = false;
+      updateResultDisplay({
+        type: "warning",
+        message: "\u041D\u0435\u0432\u0430\u043B\u0438\u0434\u0435\u043D \u0444\u043E\u0440\u043C\u0430\u0442. \u0418\u0437\u043F\u043E\u043B\u0437\u0432\u0430\u0439\u0442\u0435 \u0441\u0430\u043C\u043E \u0435\u0434\u043D\u0430 \u0434\u0435\u0441\u0435\u0442\u0438\u0447\u043D\u0430 \u0442\u043E\u0447\u043A\u0430."
+      });
+      return false;
+    }
+    markValid(input);
+    store.validation[fieldId] = true;
+    autoConvert(fieldId, value);
+    return true;
+  }
+  function resetInput(input) {
+    if (!input) return;
+    input.value = "";
+    input.disabled = false;
+    clearValidation(input);
+    store.inputs[input.id] = "";
+    store.validation[input.id] = false;
+  }
+  function resetAll() {
+    const {
+      priceEur,
+      priceBgn,
+      paidEur,
+      paidBgn,
+      changeEur,
+      changeBgn,
+      resultsLine
+    } = elements;
+    resetInput(priceEur);
+    resetInput(priceBgn);
+    resetInput(paidEur);
+    resetInput(paidBgn);
+    resetInput(changeEur);
+    resetInput(changeBgn);
+    if (resultsLine) {
+      resultsLine.classList.remove("opacity-100");
+      resultsLine.classList.add("opacity-0", "pointer-events-none");
+      resultsLine.innerHTML = "";
+    }
+    const instructions = document.getElementById("messageLine");
+    if (instructions) {
+      instructions.classList.remove("opacity-0", "pointer-events-none");
+      instructions.classList.add("opacity-100");
+    }
+  }
+  function initInputsListener() {
+    const wrapper = document.getElementById("calcInputs");
+    if (!wrapper) {
+      console.warn("calcInputs wrapper not found");
+      return;
+    }
+    wrapper.addEventListener("input", (event) => {
+      const input = event.target;
+      if (!input.matches("input")) return;
+      const valid = validateInput(input);
+      if (valid === "empty") {
+        if (store.mode === "change" && (input.id === "changeEur" || input.id === "changeBgn")) {
+          if (input.id === "changeEur") elements.changeBgn.disabled = false;
+          if (input.id === "changeBgn") elements.changeEur.disabled = false;
+          const base = calculateChange();
+          updateResultDisplay(base);
+        }
+        return;
+      }
+      if (!valid) return;
+      let result = null;
+      if (store.mode === "payment") {
+        result = calculatePayment();
+      } else if (store.mode === "change") {
+        result = calculateChange();
+      }
+      if (store.mode === "change" && (input.id === "changeEur" || input.id === "changeBgn")) {
+        const result2 = calculateChange();
+        if (!result2 || result2.type !== "change") {
+          updateResultDisplay(result2 || null);
+          return;
+        }
+        const { maxEur, maxBgn } = result2;
+        const state = handleChangeField(input, maxEur, maxBgn);
+        if (!state.valid) {
+          updateResultDisplay({
+            type: "warning",
+            message: state.warning || "\u041D\u0435\u0432\u0430\u043B\u0438\u0434\u043D\u0430 \u0441\u0442\u043E\u0439\u043D\u043E\u0441\u0442"
+          });
+          return;
+        }
+        if (!input.value) {
+          updateResultDisplay(result2);
+          return;
+        }
+        if (state.mixed) {
+          const partial = parseFloat(input.value.replace(",", "."));
+          if (input.id === "changeEur" && partial > result2.totalChangeEUR || input.id === "changeBgn" && partial > result2.totalChangeBGN) {
+            markInvalid(input);
+            updateResultDisplay({
+              type: "warning",
+              message: "\u0412\u043D\u0438\u043C\u0430\u043D\u0438\u0435! \u0412\u044A\u0432\u0435\u0434\u0435\u043D\u0430\u0442\u0430 \u0441\u0443\u043C\u0430 \u0437\u0430 \u0447\u0430\u0441\u0442\u0438\u0447\u043D\u043E \u0440\u0435\u0441\u0442\u043E \u0435 \u043F\u043E-\u0433\u043E\u043B\u044F\u043C\u0430 \u043E\u0442 \u0446\u044F\u043B\u0430\u0442\u0430 \u0441\u0442\u043E\u0439\u043D\u043E\u0441\u0442 \u043D\u0430 \u0440\u0435\u0441\u0442\u043E\u0442\u043E."
+            });
+            return;
+          }
+          let mixedEur, mixedBgn;
+          if (input.id === "changeEur") {
+            mixedEur = partial;
+            mixedBgn = (result2.totalChangeEUR - partial) * store.rate;
+          } else {
+            mixedBgn = partial;
+            mixedEur = (result2.totalChangeBGN - partial) / store.rate;
+          }
+          result2.hasMixed = true;
+          result2.mixedEur = mixedEur;
+          result2.mixedBgn = mixedBgn;
+          updateResultDisplay(result2);
+          return;
+        }
+        updateResultDisplay(result2);
+        return;
+      }
+      updateResultDisplay(result);
+      document.dispatchEvent(
+        new CustomEvent("show-notification", {
+          detail: { type: valid ? "success" : "error", fieldId: input.id }
+        })
+      );
+    });
+    wrapper.addEventListener("focusin", (event) => {
+      const input = event.target;
+      if (input.matches("input")) {
+        if (store.activeInput && store.activeInput !== input) {
+          safeFormat(store.activeInput);
+        }
+        store.activeInput = input;
+      }
+    });
+    document.addEventListener("click", (event) => {
+      const active = store.activeInput;
+      if (!active) return;
+      if (event.target === active || active.contains(event.target)) return;
+      if (event.target.closest("#numpad")) return;
+      safeFormat(active);
+    });
+  }
+  var init_inputs_handling = __esm({
+    "src/scripts/inputs-handling.js"() {
+      init_variables();
+      init_calculations();
+      init_calc_interface();
+    }
+  });
+
+  // src/scripts/utils.js
+  function initThemeSwitch() {
+    document.getElementById("themeToggle").addEventListener("click", () => {
+      const html = document.documentElement;
+      html.classList.toggle("dark");
+      if (html.classList.contains("dark")) {
+        localStorage.setItem("theme", "dark");
+      } else {
+        localStorage.setItem("theme", "light");
+      }
+    });
+    if (localStorage.getItem("theme") === "dark") {
+      document.documentElement.classList.add("dark");
+    }
+  }
+  function initURLLoader() {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has("price")) return;
+    let raw = params.get("price").toLowerCase().trim();
+    raw = raw.replace(",", ".");
+    const number = parseFloat(raw);
+    if (isNaN(number)) return;
+    const isEur = raw.endsWith("eur");
+    const isBgn = raw.endsWith("bgn");
+    if (!isEur && !isBgn) return;
+    store.mode = "change";
+    document.getElementById("modeChange").click();
+    if (isEur) {
+      elements.priceEur.value = number.toFixed(2);
+      validateInput(elements.priceEur);
+    }
+    if (isBgn) {
+      elements.priceBgn.value = number.toFixed(2);
+      validateInput(elements.priceBgn);
+    }
+    const result = calculateChange();
+    updateResultDisplay(result);
+  }
+  var init_utils = __esm({
+    "src/scripts/utils.js"() {
+      init_variables();
+      init_calculations();
+      init_inputs_handling();
+      init_calc_interface();
+    }
+  });
+
   // src/scripts/main.js
   var require_main = __commonJS({
     "src/scripts/main.js"() {
@@ -712,6 +760,7 @@
         initKeypadToggle();
         initResetButton();
         initKeypadInput();
+        initURLLoader();
       });
     }
   });
