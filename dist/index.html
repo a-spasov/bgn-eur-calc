@@ -65,20 +65,21 @@
                 <div>
                     <!-- KEYPAD TOGGLE BUTTON -->
                     <button id="toggleNumpad"
-                        class="rounded-lg text-base font-bold px-3 py-0 mr-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">
+                        class="rounded-lg w-12 text-base font-bold px-3 py-0 mr-3 bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">
                         <i class="fa-solid fa-keyboard"></i>
                     </button>
 
                     <!-- RESET CALCULATOR -->
                     <button id="resetCalc"
-                        class="rounded-lg text-base font-bold px-3 py-0 text-white bg-red-500 border-b-4 border-b-red-700 active:translate-y-[2px] active:border-b-0">
-                        <i class="fa-solid fa-rotate-left"></i>
+                        class="rounded-lg w-12 text-base font-bold px-3 py-0 text-white bg-red-500 border-b-4 border-b-red-700 active:translate-y-[2px] active:border-b-0">
+                        <i class="fa-solid fa-arrows-rotate"></i>
                     </button>
                 </div>
             </div>
 
             <!-- DISPLAY -->
-            <div id="calcDisplay" class="relative w-lg h-30 flex flex-col mb-8 px-5 py-4 rounded-lg bg-slate-900 text-white dark:bg-gray-300 dark:text-gray-800">
+            <div id="calcDisplay"
+                class="relative w-lg h-30 flex flex-col mb-8 px-5 py-4 rounded-lg bg-slate-900 text-white dark:bg-gray-300 dark:text-gray-800">
                 <!-- INSTRUCTIONS -->
                 <div id="messageLine" class="flex flex-col items-start justify-center gap-2
                 transition-opacity duration-500 ease-in-out
@@ -92,7 +93,8 @@
                 </div>
 
                 <!-- RESULTS (absolute overlay) -->
-                <div id="resultsLine" class="absolute top-0 left-0 w-full h-full flex flex-col justify-center items-start gap-1 px-5 py-4 transition-opacity duration-500 ease-in-out opacity-0 text-yellow-300 text-left text-sm">
+                <div id="resultsLine"
+                    class="absolute top-0 left-0 w-full h-full flex flex-col justify-center items-start gap-1 px-5 py-4 transition-opacity duration-500 ease-in-out opacity-0 text-yellow-300 text-left text-sm">
                 </div>
 
             </div>
@@ -241,22 +243,76 @@
         </div>
     </main>
     <!-- RIGHT ASIDE -->
-    <aside class="inline-block w-1/3 bg-slate-800 dark:bg-gray-200 p-6 flex flex-col max-h-screen overflow-y-auto">
-        <!-- Theme switcher at top -->
-        <button id="themeToggle"
-            class="mb-6 relative w-16 h-8 rounded-full flex items-center px-1 text-amber-500 bg-slate-400 dark:bg-gray-400 transition-colors duration-300">
-            <i class="fa-solid fa-moon text-amber-800 text-lg absolute left-2 opacity-50 dark:opacity-100"></i>
-            <i class="fa-solid fa-sun text-yellow-300 text-lg absolute right-2 dark:opacity-0"></i>
-            <span
-                class="absolute w-6 h-6 bg-white dark:bg-gray-800 rounded-full transform translate-x-0 dark:translate-x-8 transition-transform"></span>
-        </button>
-
+    <aside class="inline-flex flex-col justify-center gap-12 w-1/3 bg-slate-800 dark:bg-gray-200 p-6 flex flex-col max-h-screen overflow-y-auto">
         <!-- Aside Content -->
-        <h1 class="text-3xl font-bold mb-4">Калкулатор за смесено плащане и ресто</h1>
-        <p class="text-lg leading-relaxed">
-            Изчислява комбинирани плащания в BGN/EUR и ресто.
+        <h1 class="flex items-center justify-between text-3xl text-gray-200 font-bold tracking-wider mb-8"><span>Валутен
+                калкулатор</span> <!-- Theme switcher at top -->
+            <button id="themeToggle"
+                class="relative w-12 h-6 rounded-full flex items-center px-1 text-amber-500 bg-slate-400 dark:bg-gray-400 transition-colors duration-300">
+                <i
+                    class="fa-solid fa-moon text-amber-800 text-sm absolute left-2 cursor-pointer opacity-50 dark:opacity-100 dark:cursor-default"></i>
+                <i class="fa-solid fa-sun text-yellow-300 text-sm absolute right-2 dark:opacity-0"></i>
+                <span
+                    class="absolute size-4 bg-white dark:bg-gray-800 rounded-full transform translate-x-0 dark:translate-x-6 transition-transform"></span>
+            </button>
+        </h1>
+        <p class="text-base text-gray-300 tracking-wider">
+            Изчислява комбинирани плащания или ресто в левове и евро по фиксиран курс:
+            <span class="block font-bold">
+                <span class="text-blue-300">1.00 EUR</span> =
+                <span class="text-orange-400">1.95583 BGN</span>
+            </span>
         </p>
-
+        <h2 class="text-gray-200 font-bold text-2xl tracking-wider mb-4">Инструкции за работа:</h2>
+        <ul class="text-gray-300 text-base tracking-wider list-inside list-disc">
+            <li class="mb-3">
+                <div class="relative inline-flex rounded-md bg-slate-900 dark:bg-gray-300 p-1">
+                    <div
+                        class="absolute top-1 left-1 h-5 w-[130px] rounded-sm bg-orange-500 transition-all duration-300 ease-out">
+                    </div>
+                    <button class="relative z-10 text-sm font-bold w-[130px] tracking-wider dark:text-gray-900">
+                        Плащане
+                    </button>
+                    <button class="relative z-10 text-sm font-bold w-[130px] tracking-wider dark:text-gray-900">
+                        Ресто
+                    </button>
+                </div>
+                <span class="mx-3">-</span>
+                <span>
+                    избор на режим за пресмятане на комбинирано плащане или ресто;
+                </span>
+            </li>
+            <li class="mb-3">
+                <button
+                    class="rounded-lg text-sm font-bold w-10 px-3 py-[0.0675rem] bg-stone-200 text-gray-700 border-b-4 border-b-stone-400 dark:bg-yellow-100 dark:text-gray-800 dark:border-b-yellow-300">
+                    <i class="fa-solid fa-keyboard"></i>
+                </button>
+                <span class="mx-3">-</span>
+                <span>
+                    бутон за вкл./изкл. на клавиатура;
+                </span>
+            </li>
+            <li class="">
+                <button
+                    class="rounded-lg text-sm font-bold w-10 px-3 py-[0.0675rem] text-white bg-red-500 border-b-4 border-b-red-700">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                </button>
+                <span class="mx-3">-</span>
+                <span>
+                    бутон за нулиране на въведените данни;
+                </span>
+            </li>
+        </ul>
+        <h2 class="text-gray-200 font-bold text-2xl tracking-wider mb-4"><i
+                class="fa-solid fa-triangle-exclamation text-yellow-300 mr-2"></i>Внимание</h2>
+        <p class="text-base text-gray-300 tracking-wider">
+            Калкулаторът може да работи със смесени плащания и да изчислява смесено ресто.
+        </p>
+        <p class="text-base text-gray-300 tracking-wider">
+            В случаите, когато се търси ресто в двете валути, трябва да се въведат данни в едно от двете полета "<span
+                class="text-blue-300 font-bold">Ресто в евро (€)</span>" или "<span
+                class="text-orange-400 font-bold">Ресто в лева</span>".
+        </p>
     </aside>
     <script src="./scripts.js"></script>
 </body>
