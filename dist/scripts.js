@@ -28,12 +28,16 @@
         numpad: document.getElementById("numpad"),
         toggleNumpad: document.getElementById("toggleNumpad"),
         messageIcon: document.getElementById("messageIcon"),
-        resultsLine: document.getElementById("resultsLine")
+        resultsLine: document.getElementById("resultsLine"),
+        infoAside: document.getElementById("infoAside"),
+        toggleAside: document.getElementById("toggleAside"),
+        closeAside: document.getElementById("closeAside")
       };
       store = {
         mode: "payment",
         rate: 1.95583,
         keyboardVisible: false,
+        asideVisible: false,
         inputs: {
           priceEur: null,
           priceBgn: null,
@@ -128,7 +132,7 @@
     const isPaymentMode = store.mode === "payment";
     messageText.textContent = isPaymentMode ? "\u0417\u0430 \u0434\u0430 \u0440\u0430\u0437\u0431\u0435\u0440\u0435\u0442\u0435 \u043A\u043E\u043B\u043A\u043E \u0434\u0430 \u0434\u043E\u043F\u043B\u0430\u0442\u0438\u0442\u0435, \u0432\u044A\u0432\u0435\u0434\u0435\u0442\u0435:" : "\u0417\u0430 \u0434\u0430 \u0440\u0430\u0437\u0431\u0435\u0440\u0435\u0442\u0435 \u043A\u043E\u043B\u043A\u043E \u0434\u0430 \u0432\u044A\u0440\u043D\u0435\u0442\u0435, \u0432\u044A\u0432\u0435\u0434\u0435\u0442\u0435:";
     const items = isPaymentMode ? [
-      "\u043E\u0431\u0449\u0430 \u0446\u0435\u043D\u0430 \u043D\u0430 \u0441\u0442\u043E\u043A\u0430\u0442\u0430/\u0443\u0441\u043B\u0443\u0433\u0430\u0442\u0430 \u0432 \u0435\u0432\u0440\u043E \u0438\u043B\u0438 \u043B\u0432.",
+      "\u043E\u0431\u0449\u0430 \u0446\u0435\u043D\u0430 \u0432 \u0435\u0432\u0440\u043E \u0438\u043B\u0438 \u043B\u0432.",
       "\u0447\u0430\u0441\u0442\u0438\u0447\u043D\u0430 \u043F\u043B\u0430\u0442\u0435\u043D\u0430\u0442\u0430 \u0441\u0443\u043C\u0430 \u0432 \u0435\u0432\u0440\u043E \u0438\u043B\u0438 \u043B\u0432."
     ] : [
       "\u043E\u0431\u0449\u0430 \u0446\u0435\u043D\u0430 \u0432 \u0435\u0432\u0440\u043E \u0438\u043B\u0438 \u043B\u0432.",
@@ -137,15 +141,24 @@
     ];
     items.forEach((text, index) => {
       const li = document.createElement("li");
-      li.classList.add(`inputs-line-${index + 1}`, "flex", "items-center", "gap-2");
+      li.classList.add(
+        `inputs-line-${index + 1}`,
+        "flex",
+        "items-center",
+        "justify-start",
+        "gap-2"
+      );
       const indicator = document.createElement("span");
       indicator.className = `
             check-indicator inline-block
             size-3 rounded-full border border-current
             opacity-50
         `;
+      const textSpan = document.createElement("span");
+      textSpan.className = "max-w-13/14";
+      textSpan.textContent = text;
       li.appendChild(indicator);
-      li.appendChild(document.createTextNode(text));
+      li.appendChild(textSpan);
       checklist.appendChild(li);
     });
   }
@@ -205,7 +218,9 @@
   }
   function initModeSwitch() {
     const { modePayment, modeChange, modeSlider, changeInputs, numpad } = elements;
-    const SLIDE_WIDTH = 130;
+    const getSlideOffset = () => {
+      return window.innerWidth < 640 ? "95%" : "130px";
+    };
     const ACTIVE = ["text-white", "text-shadow-lg", "cursor-default"];
     const INACTIVE = ["text-slate-500", "text-shadow-none", "cursor-pointer"];
     const setActive = (el) => el.classList.add(...ACTIVE) & el.classList.remove(...INACTIVE);
@@ -219,7 +234,12 @@
       changeInputs.classList.add("invisible", "opacity-0", "payment-mode");
       if (numpad?.classList.contains("keyboard-on")) {
         setTimeout(() => {
-          numpad.style.transform = "translateY(-74px)";
+          const width = window.innerWidth;
+          if (width >= 1280 && width < 1536) {
+            numpad.style.transform = "translateY(-54px)";
+          } else if (width >= 1536) {
+            numpad.style.transform = "translateY(-74px)";
+          }
         }, 800);
       }
       updateDisplayText();
@@ -227,7 +247,7 @@
     function setChangeMode() {
       store.mode = "change";
       resetAll();
-      modeSlider.style.transform = `translateX(${SLIDE_WIDTH}px)`;
+      modeSlider.style.transform = `translateX(${getSlideOffset()})`;
       setActive(modeChange);
       setInactive(modePayment);
       const keyboardOpen = numpad?.classList.contains("keyboard-on");
@@ -265,9 +285,56 @@
         store.keyboardVisible = true;
         if (isPaymentMode) {
           setTimeout(() => {
-            numpad.style.transform = "translateY(-74px)";
+            const width = window.innerWidth;
+            if (width >= 1280 && width < 1536) {
+              numpad.style.transform = "translateY(-54px)";
+            } else if (width >= 1536) {
+              numpad.style.transform = "translateY(-74px)";
+            }
           }, 500);
         }
+      }
+    });
+  }
+  function initAsideToggle() {
+    const { infoAside, toggleAside, closeAside } = elements;
+    if (!infoAside || !toggleAside) return;
+    const ASIDE_SHADOW = [
+      "shadow-[0_0_0_9999px_rgba(0,0,0,0.35)]",
+      "dark:shadow-[0_0_0_9999px_rgba(255,255,255,0.05)]"
+    ];
+    const CLOSED_CLASS = "translate-x-full";
+    const openAside = () => {
+      store.asideVisible = true;
+      infoAside.classList.remove(CLOSED_CLASS);
+      if (window.innerWidth < 1280) {
+        infoAside.classList.add(...ASIDE_SHADOW);
+      }
+    };
+    const closeAsideFn = () => {
+      store.asideVisible = false;
+      infoAside.classList.add(CLOSED_CLASS);
+      infoAside.classList.remove(...ASIDE_SHADOW);
+    };
+    document.addEventListener("click", (e) => {
+      if (window.innerWidth >= 1280) return;
+      const clickedToggle = toggleAside.contains(e.target);
+      const clickedClose = closeAside?.contains(e.target);
+      const clickedInside = infoAside.contains(e.target);
+      if (clickedToggle) {
+        store.asideVisible ? closeAsideFn() : openAside();
+        return;
+      }
+      if (clickedClose || store.asideVisible && !clickedInside) {
+        closeAsideFn();
+      }
+    });
+    window.addEventListener("resize", () => {
+      if (window.innerWidth >= 1280) {
+        store.asideVisible = false;
+        infoAside.classList.remove(CLOSED_CLASS, ...ASIDE_SHADOW);
+      } else if (!store.asideVisible) {
+        infoAside.classList.add(CLOSED_CLASS);
       }
     });
   }
@@ -758,6 +825,7 @@
         initInputFeedback();
         initInputsListener();
         initKeypadToggle();
+        initAsideToggle();
         initResetButton();
         initKeypadInput();
         initURLLoader();
