@@ -701,18 +701,18 @@
 
   // src/scripts/utils.js
   function initThemeSwitch() {
+    localStorage.setItem("theme", "dark");
+    document.documentElement.classList.add("dark");
     document.getElementById("themeToggle").addEventListener("click", () => {
       const html = document.documentElement;
-      html.classList.toggle("dark");
       if (html.classList.contains("dark")) {
-        localStorage.setItem("theme", "dark");
-      } else {
         localStorage.setItem("theme", "light");
+        html.classList.remove("dark");
+      } else {
+        localStorage.setItem("theme", "dark");
+        html.classList.add("dark");
       }
     });
-    if (localStorage.getItem("theme") === "dark") {
-      document.documentElement.classList.add("dark");
-    }
   }
   function initURLLoader() {
     const params = new URLSearchParams(window.location.search);
