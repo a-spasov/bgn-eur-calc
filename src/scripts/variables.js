@@ -16,12 +16,16 @@ export const elements = {
     toggleNumpad: document.getElementById("toggleNumpad"),
     messageIcon: document.getElementById("messageIcon"),
     resultsLine: document.getElementById("resultsLine"),
+    infoAside: document.getElementById("infoAside"),
+    toggleAside: document.getElementById("toggleAside"),
+    closeAside: document.getElementById("closeAside"),
 };
 
 export const store = {
     mode: "payment",
     rate: 1.95583,
     keyboardVisible: false,
+    asideVisible: false,
     inputs: {
         priceEur: null,
         priceBgn: null,
