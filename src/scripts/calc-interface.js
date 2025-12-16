@@ -42,7 +42,7 @@ function updateDisplayText() {
         `;
 
         const textSpan = document.createElement("span");
-        textSpan.className = "max-w-13/14"; // optional
+        textSpan.className = "w-full max-w-13/14 sm:max-w-full"; // optional
         textSpan.textContent = text;
 
         li.appendChild(indicator);
