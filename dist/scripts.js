@@ -155,7 +155,7 @@
             opacity-50
         `;
       const textSpan = document.createElement("span");
-      textSpan.className = "max-w-13/14";
+      textSpan.className = "w-full max-w-13/14 sm:max-w-full";
       textSpan.textContent = text;
       li.appendChild(indicator);
       li.appendChild(textSpan);
