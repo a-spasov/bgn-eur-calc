@@ -1,6 +1,25 @@
 import { elements, store } from "./variables.js";
 import { formatCurrency, resetAll, validateInput } from "./inputs-handling.js";
 
+function disableNativeKeyboard(input) {
+    input.addEventListener("focus", (e) => {
+        // mobile & tablet only
+        if (window.innerWidth < 1024) {
+            e.preventDefault();
+
+            // iOS Safari workaround
+            input.blur();
+            input.focus({ preventScroll: true });
+        }
+    });
+}
+
+function initDisableNativeKeyboard() {
+    Object.values(elements)
+        .filter(el => el?.tagName === "INPUT")
+        .forEach(disableNativeKeyboard);
+}
+
 function updateDisplayText() {
     const { checklist, messageText } = elements;
     if (!checklist || !messageText) return;
@@ -497,6 +516,7 @@ function updateResultDisplay(result) {
 
 
 export {
+    initDisableNativeKeyboard,
     updateDisplayText,
     initModeSwitch,
     initKeypadToggle,
