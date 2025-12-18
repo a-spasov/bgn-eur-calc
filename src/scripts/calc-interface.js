@@ -50,13 +50,15 @@ function updateDisplayText() {
             "flex",
             "items-center",
             "justify-start",
-            "gap-2"
+            "gap-2",
+            "my-1.5",
+            "leading-none"
         );
 
         const indicator = document.createElement("span");
         indicator.className = `
             check-indicator inline-block
-            size-3 rounded-full border border-current
+            size-3.5 rounded-full border border-current
             opacity-50
         `;
 
@@ -72,13 +74,13 @@ function updateDisplayText() {
 
 function setIndicatorIdle(el) {
     el.innerHTML = "";
-    el.className = `check-indicator inline-block size-3 rounded-full border border-current opacity-50`;
+    el.className = `check-indicator inline-block size-3.5 rounded-full border border-current opacity-50`;
 }
 
 function setIndicatorSuccess(el) {
     el.className = `
         check-indicator inline-flex items-center justify-center 
-        size-3 rounded-full bg-lime-500 text-white
+        size-3.5 rounded-full bg-lime-600 text-white
     `;
     el.innerHTML = `<i class="fa-solid fa-check text-[8px] leading-none"></i>`;
 }
@@ -86,11 +88,11 @@ function setIndicatorSuccess(el) {
 function setIndicatorError(el) {
     el.className = `
         check-indicator relative inline-flex items-center justify-center 
-        size-3 rounded-full bg-red-600
+        size-3.5 rounded-full bg-red-600
     `;
     el.innerHTML = `
         <span class="absolute inline-flex size-full animate-ping rounded-full bg-red-500 opacity-75"></span>
-        <span class="relative block size-3 rounded-full bg-red-600"></span>
+        <span class="relative block size-3.5 rounded-full bg-red-600"></span>
     `;
 }
 
@@ -145,8 +147,8 @@ function initModeSwitch() {
     const { modePayment, modeChange, modeSlider, changeInputs, numpad } = elements;
 
     const getSlideOffset = () => {
-    return window.innerWidth < 640 ? "95%" : "130px";
-};
+        return window.innerWidth < 640 ? "95%" : "130px";
+    };
     const ACTIVE = ["text-white", "text-shadow-lg", "cursor-default"];
     const INACTIVE = ["text-slate-500", "text-shadow-none", "cursor-pointer"];
 
@@ -167,10 +169,12 @@ function initModeSwitch() {
             setTimeout(() => {
                 const width = window.innerWidth;
 
-                if (width >= 1280 && width < 1536) {
-                    numpad.style.transform = "translateY(-54px)";
+                if (width < 400) {
+                    numpad.style.transform = "translateY(-112px)";
+                } else if (width >= 400 && width < 1536) {
+                    numpad.style.transform = "translateY(-88px)";
                 } else if (width >= 1536) {
-                    numpad.style.transform = "translateY(-74px)";
+                    numpad.style.transform = "translateY(-92px)";
                 }
             }, 800);
         }
@@ -208,6 +212,25 @@ function initModeSwitch() {
 
 function initKeypadToggle() {
     const { toggleNumpad, numpad } = elements;
+    if (window.innerWidth < 1280) {
+        numpad.classList.add("keyboard-on");
+        numpad.classList.remove("xl:invisible", "xl:opacity-0");
+        store.keyboardVisible = true;
+
+        if (store.mode === "payment") {
+            setTimeout(() => {
+                const width = window.innerWidth;
+                
+                if (width < 400) {
+                    numpad.style.transform = "translateY(-112px)";
+                } else if (width >= 400 && width < 1536)  {
+                    numpad.style.transform = "translateY(-88px)";
+                } else if (width >= 1536) {
+                    numpad.style.transform = "translateY(-92px)";
+                }
+            }, 0);
+        }
+    }
 
     numpad.addEventListener("mousedown", (event) => {
         const btn = event.target.closest("button");
@@ -233,10 +256,10 @@ function initKeypadToggle() {
                 setTimeout(() => {
                     const width = window.innerWidth;
 
-                    if (width >= 1280 && width < 1536) {
-                        numpad.style.transform = "translateY(-54px)";
+                    if (width < 1536) {
+                        numpad.style.transform = "translateY(-88px)";
                     } else if (width >= 1536) {
-                        numpad.style.transform = "translateY(-74px)";
+                        numpad.style.transform = "translateY(-92px)";
                     }
                 }, 500);
             }
@@ -295,7 +318,6 @@ function initAsideToggle() {
         }
     });
 }
-
 
 function initResetButton() {
     const { resetCalc } = elements;
@@ -378,10 +400,10 @@ function updateResultDisplay(result) {
     // WARNING (applies only to payment mode)
     if (result.type === "warning") {
         results.innerHTML = `
-        <div class="flex items-center gap-2 text-yellow-400 font-semibold text-base">
-            <span class="relative size-3 inline-flex items-center justify-center">
-                <span class="absolute size-3 rounded-full bg-red-500 opacity-75 animate-ping"></span>
-                <span class="relative size-3 rounded-full bg-red-600"></span>
+        <div class="flex items-center gap-2 text-gray-500 dark:text-yellow-400 font-bold text-base">
+            <span class="relative size-3.5 inline-flex items-center justify-center">
+                <span class="absolute size-3.5 rounded-full bg-red-500 opacity-75 animate-ping"></span>
+                <span class="relative size-3.5 rounded-full bg-red-600"></span>
             </span>
             ${result.message}
         </div>`;
@@ -401,23 +423,25 @@ function updateResultDisplay(result) {
 
         // Unified RECEIVED line for all cases
         const receivedLine = `
+        <div class="my-1">
         Получени:
-        <span class="ml-2 font-bold text-blue-300">
-            ${totalPaidEUR.toFixed(2)} евро
+        <span class="ml-2 font-bold text-sky-600 dark:text-blue-300">
+            <span class="text-base">${totalPaidEUR.toFixed(2)}</span> евро
         </span>
         <span class="ml-2">
-            ( = <span class="font-bold text-orange-400">${totalPaidBGN.toFixed(2)} лв.</span> )
+            ( = <span class="font-bold text-orange-500 dark:text-orange-400"><span class="text-base">${totalPaidBGN.toFixed(2)}</span> лв.</span> )
         </span>
+        </div>
     `;
 
         // Line 1: PRICE
         const priceLine = `
         Цена:
-        <span class="ml-2 font-bold text-blue-300">
-            ${result.priceEUR.toFixed(2)} евро
+        <span class="ml-2 font-bold text-sky-600 dark:text-blue-300">
+            <span class="text-base">${result.priceEUR.toFixed(2)}</span> евро
         </span>
         <span class="ml-2">
-            ( = <span class="font-bold text-orange-400">${result.priceBGN.toFixed(2)} лв.</span> )
+            ( = <span class="font-bold text-orange-500 dark:text-orange-400"><span class="text-base">${result.priceBGN.toFixed(2)}</span> лв.</span> )
         </span>
     `;
 
@@ -427,29 +451,33 @@ function updateResultDisplay(result) {
         if (result.hasMixed) {
             // Mixed change: show eur + bgn combination
             changeLine = `
+            <span class="absolute inset-0 bg-gray-200 dark:bg-slate-600 rounded-md z-0 -mx-2 -my-1 animate-pulse"></span>
+            <span class="relative">
             Ресто: 
-            <span class="ml-2 font-bold text-blue-300">
-                ${result.mixedEur.toFixed(2)} евро
+            <span class="ml-2 font-bold text-sky-600 dark:text-blue-300">
+                <span class="text-base">${result.mixedEur.toFixed(2)}</span> евро
             </span>
             и
-            <span class="ml-1 font-bold text-orange-400">
-                ${result.mixedBgn.toFixed(2)} лв.
+            <span class="ml-1 font-bold text-orange-500 dark:text-orange-400">
+                <span class="text-base">${result.mixedBgn.toFixed(2)}</span> лв.
             </span>
-            <span class="align-top text-red-500 font-bold">*</span>
+            </span>
         `;
         } else {
             // Normal change
             changeLine = `
+            <span class="absolute inset-0 bg-gray-200 dark:bg-slate-600 rounded-md z-0 -mx-2 -my-1 animate-pulse"></span>
+            <span class="relative">
             Ресто: 
-            <span class="ml-2 font-bold text-blue-300">
-                ${Math.abs(result.totalChangeEUR).toFixed(2)} евро
+            <span class="ml-2 font-bold text-sky-600 dark:text-blue-300">
+                <span class="text-base">${Math.abs(result.totalChangeEUR).toFixed(2)}</span> евро
             </span>
             ( или 
-            <span class="font-bold text-orange-400">
-                ${Math.abs(result.totalChangeBGN).toFixed(2)} лв.
+            <span class="font-bold text-orange-500 dark:text-orange-400">
+                <span class="text-base">${Math.abs(result.totalChangeBGN).toFixed(2)}</span> лв.
             </span>
             )
-            <span class="align-top text-red-500 font-bold">*</span>
+            </span>
         `;
         }
 
@@ -463,13 +491,9 @@ function updateResultDisplay(result) {
             ${receivedLine}
         </div>
 
-        <div class="text-sm">
+        <div class="text-sm relative w-full">
             ${changeLine}
         </div>
-        <div class="text-xs mt-1 text-gray-300 tracking-widest font-bold">
-                    <span class="font-bold text-red-500">*</span>
-                    За смесено ресто използвайте последните две полета
-                   </div>
     `;
 
         return;
@@ -484,36 +508,38 @@ function updateResultDisplay(result) {
     results.innerHTML = `
         <div class="text-sm">
             Цена:
-            <span class="ml-2 mr-1 font-bold text-blue-300">
-                <span class="text-base text-shadow-lg">${result.priceEUR.toFixed(2)}</span> евро
+            <span class="ml-2 mr-1 font-bold text-sky-600 dark:text-blue-300">
+                <span class="text-base">${result.priceEUR.toFixed(2)}</span> евро
             </span>
             ( = 
-            <span class="ml-1 font-bold text-orange-400">
-                <span class="text-base text-shadow-lg">${result.priceBGN.toFixed(2)}</span> лв.
+            <span class="ml-1 font-bold text-orange-500 dark:text-orange-400">
+                <span class="text-base">${result.priceBGN.toFixed(2)}</span> лв.
             </span>
             )
         </div>
 
-        <div class="text-sm">
+        <div class="text-sm my-1">
             Платени до момента:
-            <span class="ml-2 font-bold ${paidIsEUR ? "text-blue-300" : "text-orange-400"}">
-                <span class="text-base text-shadow-lg">${result.paidLabel}</span>
+            <span class="ml-2 font-bold ${paidIsEUR ? "text-sky-600 dark:text-blue-300" : "text-orange-500 dark:text-orange-400"}">
+                <span class="text-base">${result.paidLabel}</span>
             </span>
         </div>
 
-        <div class="text-sm">
+        <div class="relative text-sm">
+            <span class="absolute inset-0 bg-gray-200 dark:bg-slate-600 rounded-md z-0 -mx-2 -my-1 animate-pulse"></span>
+            <span class="relative">
             Остават за доплащане:
-            <span class="ml-2 mr-1 font-bold text-blue-300">
-                <span class="text-base text-shadow-lg">${result.remainingEUR.toFixed(2)}</span> евро
+            <span class="ml-2 mr-1 font-bold text-sky-600 dark:text-blue-300">
+                <span class="text-base">${result.remainingEUR.toFixed(2)}</span> евро
             </span>
             или
-            <span class="ml-1 font-bold text-orange-400">
-                <span class="text-base text-shadow-lg">${result.remainingBGN.toFixed(2)}</span> лв.
+            <span class="ml-1 font-bold text-orange-500 dark:text-orange-400">
+                <span class="text-base">${result.remainingBGN.toFixed(2)}</span> лв.
+            </span>
             </span>
         </div>
     `;
 }
-
 
 export {
     initDisableNativeKeyboard,
