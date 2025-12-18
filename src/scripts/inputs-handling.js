@@ -1,6 +1,6 @@
 import { elements, store } from "./variables.js";
 import { calculatePayment, calculateChange } from "./calculations.js";
-import { updateResultDisplay } from "./calc-interface.js";
+import { updateResultDisplay, scrollInputsPanelToTop } from "./calc-interface.js";
 
 function autoConvert(fieldId, rawValue) {
     const value = parseFloat(rawValue);
@@ -341,6 +341,7 @@ function initInputsListener() {
             }
 
             store.activeInput = input;
+            scrollInputsPanelToTop();
         }
     });
 

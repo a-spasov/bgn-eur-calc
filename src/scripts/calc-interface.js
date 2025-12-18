@@ -96,6 +96,18 @@ function setIndicatorError(el) {
     `;
 }
 
+function scrollInputsPanelToTop() {
+    if (window.innerWidth >= 640) return;
+
+    const panel = document.getElementById("calcInputs");
+    if (!panel) return;
+
+    panel.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+}
+
 function initInputFeedback() {
     document.addEventListener("show-notification", () => {
         evaluateGroup(1, ["priceEur", "priceBgn"]);
@@ -550,5 +562,6 @@ export {
     initResetButton,
     initInputFeedback,
     initKeypadInput,
-    updateResultDisplay
+    updateResultDisplay,
+    scrollInputsPanelToTop
 };
