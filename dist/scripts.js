@@ -197,6 +197,15 @@
         <span class="relative block size-3.5 rounded-full bg-red-600"></span>
     `;
   }
+  function scrollInputsPanelToTop() {
+    if (window.innerWidth >= 640) return;
+    const panel = document.getElementById("calcInputs");
+    if (!panel) return;
+    panel.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }
   function initInputFeedback() {
     document.addEventListener("show-notification", () => {
       evaluateGroup(1, ["priceEur", "priceBgn"]);
@@ -645,8 +654,22 @@
     if (raw === "") {
       clearValidation(input);
       store.validation[fieldId] = false;
+      store.inputs[fieldId] = "";
+      if (fieldId === "priceEur") {
+        elements.priceBgn.value = "";
+        elements.priceBgn.disabled = false;
+        clearValidation(elements.priceBgn);
+        store.inputs.priceBgn = "";
+        store.validation.priceBgn = false;
+      }
+      if (fieldId === "priceBgn") {
+        elements.priceEur.value = "";
+        elements.priceEur.disabled = false;
+        clearValidation(elements.priceEur);
+        store.inputs.priceEur = "";
+        store.validation.priceEur = false;
+      }
       if (fieldId === "changeEur" || fieldId === "changeBgn") {
-        store.inputs[fieldId] = "";
         return "empty";
       }
       return false;
@@ -786,6 +809,7 @@
           safeFormat(store.activeInput);
         }
         store.activeInput = input;
+        scrollInputsPanelToTop();
       }
     });
     document.addEventListener("click", (event) => {
