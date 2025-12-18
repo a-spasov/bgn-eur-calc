@@ -3,10 +3,8 @@ import { formatCurrency, resetAll, validateInput } from "./inputs-handling.js";
 
 function disableNativeKeyboard(input) {
     input.addEventListener("focus", (e) => {
-        // mobile & tablet only
         if (window.innerWidth < 1024) {
             e.preventDefault();
-
             // iOS Safari workaround
             input.blur();
             input.focus({ preventScroll: true });
@@ -232,10 +230,10 @@ function initKeypadToggle() {
         if (store.mode === "payment") {
             setTimeout(() => {
                 const width = window.innerWidth;
-                
+
                 if (width < 400) {
                     numpad.style.transform = "translateY(-112px)";
-                } else if (width >= 400 && width < 1536)  {
+                } else if (width >= 400 && width < 1536) {
                     numpad.style.transform = "translateY(-88px)";
                 } else if (width >= 1536) {
                     numpad.style.transform = "translateY(-92px)";
@@ -389,7 +387,6 @@ function updateResultDisplay(result) {
 
     if (!instructions || !results) return;
 
-    // CASE 1 — No result → show instructions
     if (!result) {
         instructions.classList.remove("opacity-0", "pointer-events-none");
         instructions.classList.add("opacity-100");
@@ -401,15 +398,12 @@ function updateResultDisplay(result) {
         return;
     }
 
-    // Fade OUT instructions
     instructions.classList.remove("opacity-100");
     instructions.classList.add("opacity-0", "pointer-events-none");
 
-    // Fade IN results
     results.classList.remove("opacity-0", "pointer-events-none");
     results.classList.add("opacity-100");
 
-    // WARNING (applies only to payment mode)
     if (result.type === "warning") {
         results.innerHTML = `
         <div class="flex items-center gap-2 text-gray-500 dark:text-yellow-400 font-bold text-base">
@@ -421,19 +415,14 @@ function updateResultDisplay(result) {
         </div>`;
         return;
     }
-    // ============================
-    // ========== CHANGE MODE =====
-    // ============================
+    //  CHANGE MODE
     if (result.type === "change") {
-
-        // --- ALWAYS compute unified received values ---
         let totalPaidEUR = 0;
         if (result.paidEur !== null) totalPaidEUR += result.paidEur;
         if (result.paidBgn !== null) totalPaidEUR += result.paidBgn / store.rate;
 
         let totalPaidBGN = totalPaidEUR * store.rate;
 
-        // Unified RECEIVED line for all cases
         const receivedLine = `
         <div class="my-1">
         Получени:
@@ -446,7 +435,6 @@ function updateResultDisplay(result) {
         </div>
     `;
 
-        // Line 1: PRICE
         const priceLine = `
         Цена:
         <span class="ml-2 font-bold text-sky-600 dark:text-blue-300">
@@ -457,11 +445,9 @@ function updateResultDisplay(result) {
         </span>
     `;
 
-        // Line 3: CHANGE / MIXED CHANGE
         let changeLine = "";
 
         if (result.hasMixed) {
-            // Mixed change: show eur + bgn combination
             changeLine = `
             <span class="absolute inset-0 bg-gray-200 dark:bg-slate-600 rounded-md z-0 -mx-2 -my-1 animate-pulse"></span>
             <span class="relative">
@@ -476,7 +462,6 @@ function updateResultDisplay(result) {
             </span>
         `;
         } else {
-            // Normal change
             changeLine = `
             <span class="absolute inset-0 bg-gray-200 dark:bg-slate-600 rounded-md z-0 -mx-2 -my-1 animate-pulse"></span>
             <span class="relative">
@@ -493,7 +478,6 @@ function updateResultDisplay(result) {
         `;
         }
 
-        // Render final 3 lines + optional note
         results.innerHTML = `
         <div class="text-sm">
             ${priceLine}
@@ -512,9 +496,7 @@ function updateResultDisplay(result) {
     }
 
 
-    // ============================
-    // ========== PAYMENT MODE ====
-    // ============================
+    //  PAYMENT MODE
     const paidIsEUR = result.paidLabel.includes("евро");
 
     results.innerHTML = `

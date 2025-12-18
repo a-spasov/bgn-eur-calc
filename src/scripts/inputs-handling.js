@@ -59,7 +59,6 @@ function handleChangeField(input, maxEur, maxBgn) {
 
     const { changeEur, changeBgn } = elements;
 
-    // Unlock behavior
     if (!input.value) {
         if (id === "changeEur") changeBgn.disabled = false;
         if (id === "changeBgn") changeEur.disabled = false;
@@ -69,11 +68,9 @@ function handleChangeField(input, maxEur, maxBgn) {
         return { valid: true, mixed: false };
     }
 
-    // Lock the opposite field
     if (id === "changeEur") changeBgn.disabled = true;
     if (id === "changeBgn") changeEur.disabled = true;
 
-    // Validate against max allowed change
     if (isNaN(value)) {
         markInvalid(input);
         return { valid: false };
@@ -117,13 +114,10 @@ function validateInput(input) {
 
     store.inputs[fieldId] = raw;
 
-    // 1) Check for invalid characters (keep raw text)
-    // Allowed: digits and ONE dot
     if (/[^0-9.]/.test(raw)) {
         markInvalid(input);
         store.validation[fieldId] = false;
 
-        // Show red ping + stop all calculations
         updateResultDisplay({
             type: "warning",
             message: "Невалидни символи. Моля, въведете само числа."
@@ -132,39 +126,34 @@ function validateInput(input) {
         return false;
     }
 
-    // Empty input resets validation
     if (raw === "") {
-    clearValidation(input);
-    store.validation[fieldId] = false;
-    store.inputs[fieldId] = "";
+        clearValidation(input);
+        store.validation[fieldId] = false;
+        store.inputs[fieldId] = "";
 
-    // 🔓 PRICE auto-conversion cleanup
-    if (fieldId === "priceEur") {
-        elements.priceBgn.value = "";
-        elements.priceBgn.disabled = false;
-        clearValidation(elements.priceBgn);
-        store.inputs.priceBgn = "";
-        store.validation.priceBgn = false;
+        if (fieldId === "priceEur") {
+            elements.priceBgn.value = "";
+            elements.priceBgn.disabled = false;
+            clearValidation(elements.priceBgn);
+            store.inputs.priceBgn = "";
+            store.validation.priceBgn = false;
+        }
+
+        if (fieldId === "priceBgn") {
+            elements.priceEur.value = "";
+            elements.priceEur.disabled = false;
+            clearValidation(elements.priceEur);
+            store.inputs.priceEur = "";
+            store.validation.priceEur = false;
+        }
+
+        if (fieldId === "changeEur" || fieldId === "changeBgn") {
+            return "empty";
+        }
+
+        return false;
     }
 
-    if (fieldId === "priceBgn") {
-        elements.priceEur.value = "";
-        elements.priceEur.disabled = false;
-        clearValidation(elements.priceEur);
-        store.inputs.priceEur = "";
-        store.validation.priceEur = false;
-    }
-
-    // allow empty for change fields
-    if (fieldId === "changeEur" || fieldId === "changeBgn") {
-        return "empty";
-    }
-
-    return false;
-}
-
-
-    // 2) Validate numeric structure (only one dot allowed)
     if ((value.match(/\./g) || []).length > 1) {
         markInvalid(input);
         store.validation[fieldId] = false;
@@ -175,13 +164,9 @@ function validateInput(input) {
         return false;
     }
 
-    // 3) Valid numeric text → mark as valid
     markValid(input);
     store.validation[fieldId] = true;
-
-    // AUTO CONVERT ONLY FOR PRICE, NOT for paid/change
     autoConvert(fieldId, value);
-
     return true;
 }
 
@@ -207,7 +192,6 @@ function resetAll() {
         resultsLine,
     } = elements;
 
-    // Reset all input fields
     resetInput(priceEur);
     resetInput(priceBgn);
     resetInput(paidEur);
@@ -215,16 +199,12 @@ function resetAll() {
     resetInput(changeEur);
     resetInput(changeBgn);
 
-    // --- DISPLAY RESET LOGIC (NO display:none!) ---
-
-    // Hide results (fade out)
     if (resultsLine) {
         resultsLine.classList.remove("opacity-100");
         resultsLine.classList.add("opacity-0", "pointer-events-none");
         resultsLine.innerHTML = "";
     }
 
-    // Show instructions (fade in)
     const instructions = document.getElementById("messageLine");
     if (instructions) {
         instructions.classList.remove("opacity-0", "pointer-events-none");
@@ -245,28 +225,19 @@ function initInputsListener() {
 
         const valid = validateInput(input);
 
-        // CASE: change input becomes empty
         if (valid === "empty") {
-
-            if (store.mode === "change" &&
-                (input.id === "changeEur" || input.id === "changeBgn")) {
-
-                // Re-enable the opposite input
+            if (store.mode === "change" && (input.id === "changeEur" || input.id === "changeBgn")) {
                 if (input.id === "changeEur") elements.changeBgn.disabled = false;
                 if (input.id === "changeBgn") elements.changeEur.disabled = false;
 
-                // Show full original change
                 const base = calculateChange();
                 updateResultDisplay(base);
             }
-
             return;
         }
 
-        // Stop only on truly invalid input
         if (!valid) return;
 
-        // Now it's safe to continue
         let result = null;
 
         if (store.mode === "payment") {
@@ -275,10 +246,9 @@ function initInputsListener() {
             result = calculateChange();
         }
 
-        // CHANGE MODE partial change handling
         if (store.mode === "change" && (input.id === "changeEur" || input.id === "changeBgn")) {
 
-            const result = calculateChange(); // общото ресто
+            const result = calculateChange();
 
             if (!result || result.type !== "change") {
                 updateResultDisplay(result || null);
@@ -297,13 +267,11 @@ function initInputsListener() {
                 return;
             }
 
-            // If input is empty → show full standard change again
             if (!input.value) {
-                updateResultDisplay(result); // original full change
+                updateResultDisplay(result);
                 return;
             }
 
-            // If mixed change was entered
             if (state.mixed) {
                 const partial = parseFloat(input.value.replace(",", "."));
 
@@ -374,4 +342,9 @@ function initInputsListener() {
     });
 }
 
-export { initInputsListener, formatCurrency, resetAll, validateInput };
+export {
+    initInputsListener,
+    formatCurrency,
+    resetAll,
+    validateInput
+};

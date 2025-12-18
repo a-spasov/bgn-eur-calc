@@ -25,25 +25,22 @@ function initThemeSwitch() {
 function initURLLoader() {
     const params = new URLSearchParams(window.location.search);
 
-    if (!params.has("price")) return;  // no GET parameter → do nothing
+    if (!params.has("price")) return;
 
-    let raw = params.get("price").toLowerCase().trim();  // e.g. "120.99eur", "120.99bgn"
+    let raw = params.get("price").toLowerCase().trim();
     raw = raw.replace(",", ".");
-    // Extract number part
+
     const number = parseFloat(raw);
     if (isNaN(number)) return;
 
-    // Detect currency
     const isEur = raw.endsWith("eur");
     const isBgn = raw.endsWith("bgn");
 
     if (!isEur && !isBgn) return;
 
-    // Force change mode
     store.mode = "change";
-    document.getElementById("modeChange").click();  // activate UI switch
+    document.getElementById("modeChange").click();
 
-    // Fill the correct price input
     if (isEur) {
         elements.priceEur.value = number.toFixed(2);
         validateInput(elements.priceEur);
@@ -54,11 +51,9 @@ function initURLLoader() {
         validateInput(elements.priceBgn);
     }
 
-    // Trigger initial calculation
     const result = calculateChange();
     updateResultDisplay(result);
 }
-
 
 export { initURLLoader, initThemeSwitch };
 

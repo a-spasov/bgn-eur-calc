@@ -23,28 +23,6 @@ function determinePaidLabel() {
     return "";
 }
 
-function buildReceivedLabel() {
-    const eurRaw = store.inputs.paidEur;
-    const bgnRaw = store.inputs.paidBgn;
-
-    const eur = eurRaw ? parseFloat(eurRaw.replace(",", ".")) : NaN;
-    const bgn = bgnRaw ? parseFloat(bgnRaw.replace(",", ".")) : NaN;
-
-    if (!isNaN(eur) && !isNaN(bgn)) {
-        return `Получени: ${eur.toFixed(2)} евро и ${bgn.toFixed(2)} лева`;
-    }
-
-    if (!isNaN(eur)) {
-        return `Получени: ${eur.toFixed(2)} евро (${(eur * store.rate).toFixed(2)} лв.)`;
-    }
-
-    if (!isNaN(bgn)) {
-        return `Получени: ${bgn.toFixed(2)} лв. (${(bgn / store.rate).toFixed(2)} евро)`;
-    }
-
-    return "";
-}
-
 function calculatePayment() {
     const price = getUnifiedValue("priceEur", "priceBgn");
     const paid = getUnifiedValue("paidEur", "paidBgn");
