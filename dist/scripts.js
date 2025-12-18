@@ -125,6 +125,18 @@
   });
 
   // src/scripts/calc-interface.js
+  function disableNativeKeyboard(input) {
+    input.addEventListener("focus", (e) => {
+      if (window.innerWidth < 1024) {
+        e.preventDefault();
+        input.blur();
+        input.focus({ preventScroll: true });
+      }
+    });
+  }
+  function initDisableNativeKeyboard() {
+    Object.values(elements).filter((el) => el?.tagName === "INPUT").forEach(disableNativeKeyboard);
+  }
   function updateDisplayText() {
     const { checklist, messageText } = elements;
     if (!checklist || !messageText) return;
@@ -146,12 +158,14 @@
         "flex",
         "items-center",
         "justify-start",
-        "gap-2"
+        "gap-2",
+        "my-1.5",
+        "leading-none"
       );
       const indicator = document.createElement("span");
       indicator.className = `
             check-indicator inline-block
-            size-3 rounded-full border border-current
+            size-3.5 rounded-full border border-current
             opacity-50
         `;
       const textSpan = document.createElement("span");
@@ -164,23 +178,23 @@
   }
   function setIndicatorIdle(el) {
     el.innerHTML = "";
-    el.className = `check-indicator inline-block size-3 rounded-full border border-current opacity-50`;
+    el.className = `check-indicator inline-block size-3.5 rounded-full border border-current opacity-50`;
   }
   function setIndicatorSuccess(el) {
     el.className = `
         check-indicator inline-flex items-center justify-center 
-        size-3 rounded-full bg-lime-500 text-white
+        size-3.5 rounded-full bg-lime-600 text-white
     `;
     el.innerHTML = `<i class="fa-solid fa-check text-[8px] leading-none"></i>`;
   }
   function setIndicatorError(el) {
     el.className = `
         check-indicator relative inline-flex items-center justify-center 
-        size-3 rounded-full bg-red-600
+        size-3.5 rounded-full bg-red-600
     `;
     el.innerHTML = `
         <span class="absolute inline-flex size-full animate-ping rounded-full bg-red-500 opacity-75"></span>
-        <span class="relative block size-3 rounded-full bg-red-600"></span>
+        <span class="relative block size-3.5 rounded-full bg-red-600"></span>
     `;
   }
   function initInputFeedback() {
@@ -235,10 +249,12 @@
       if (numpad?.classList.contains("keyboard-on")) {
         setTimeout(() => {
           const width = window.innerWidth;
-          if (width >= 1280 && width < 1536) {
-            numpad.style.transform = "translateY(-54px)";
+          if (width < 400) {
+            numpad.style.transform = "translateY(-112px)";
+          } else if (width >= 400 && width < 1536) {
+            numpad.style.transform = "translateY(-88px)";
           } else if (width >= 1536) {
-            numpad.style.transform = "translateY(-74px)";
+            numpad.style.transform = "translateY(-92px)";
           }
         }, 800);
       }
@@ -267,6 +283,23 @@
   }
   function initKeypadToggle() {
     const { toggleNumpad, numpad } = elements;
+    if (window.innerWidth < 1280) {
+      numpad.classList.add("keyboard-on");
+      numpad.classList.remove("xl:invisible", "xl:opacity-0");
+      store.keyboardVisible = true;
+      if (store.mode === "payment") {
+        setTimeout(() => {
+          const width = window.innerWidth;
+          if (width < 400) {
+            numpad.style.transform = "translateY(-112px)";
+          } else if (width >= 400 && width < 1536) {
+            numpad.style.transform = "translateY(-88px)";
+          } else if (width >= 1536) {
+            numpad.style.transform = "translateY(-92px)";
+          }
+        }, 0);
+      }
+    }
     numpad.addEventListener("mousedown", (event) => {
       const btn = event.target.closest("button");
       if (!btn) return;
@@ -286,10 +319,10 @@
         if (isPaymentMode) {
           setTimeout(() => {
             const width = window.innerWidth;
-            if (width >= 1280 && width < 1536) {
-              numpad.style.transform = "translateY(-54px)";
+            if (width < 1536) {
+              numpad.style.transform = "translateY(-88px)";
             } else if (width >= 1536) {
-              numpad.style.transform = "translateY(-74px)";
+              numpad.style.transform = "translateY(-92px)";
             }
           }, 500);
         }
@@ -393,10 +426,10 @@
     results.classList.add("opacity-100");
     if (result.type === "warning") {
       results.innerHTML = `
-        <div class="flex items-center gap-2 text-yellow-400 font-semibold text-base">
-            <span class="relative size-3 inline-flex items-center justify-center">
-                <span class="absolute size-3 rounded-full bg-red-500 opacity-75 animate-ping"></span>
-                <span class="relative size-3 rounded-full bg-red-600"></span>
+        <div class="flex items-center gap-2 text-gray-500 dark:text-yellow-400 font-bold text-base">
+            <span class="relative size-3.5 inline-flex items-center justify-center">
+                <span class="absolute size-3.5 rounded-full bg-red-500 opacity-75 animate-ping"></span>
+                <span class="relative size-3.5 rounded-full bg-red-600"></span>
             </span>
             ${result.message}
         </div>`;
@@ -408,48 +441,54 @@
       if (result.paidBgn !== null) totalPaidEUR += result.paidBgn / store.rate;
       let totalPaidBGN = totalPaidEUR * store.rate;
       const receivedLine = `
+        <div class="my-1">
         \u041F\u043E\u043B\u0443\u0447\u0435\u043D\u0438:
-        <span class="ml-2 font-bold text-blue-300">
-            ${totalPaidEUR.toFixed(2)} \u0435\u0432\u0440\u043E
+        <span class="ml-2 font-bold text-sky-600 dark:text-blue-300">
+            <span class="text-base">${totalPaidEUR.toFixed(2)}</span> \u0435\u0432\u0440\u043E
         </span>
         <span class="ml-2">
-            ( = <span class="font-bold text-orange-400">${totalPaidBGN.toFixed(2)} \u043B\u0432.</span> )
+            ( = <span class="font-bold text-orange-500 dark:text-orange-400"><span class="text-base">${totalPaidBGN.toFixed(2)}</span> \u043B\u0432.</span> )
         </span>
+        </div>
     `;
       const priceLine = `
         \u0426\u0435\u043D\u0430:
-        <span class="ml-2 font-bold text-blue-300">
-            ${result.priceEUR.toFixed(2)} \u0435\u0432\u0440\u043E
+        <span class="ml-2 font-bold text-sky-600 dark:text-blue-300">
+            <span class="text-base">${result.priceEUR.toFixed(2)}</span> \u0435\u0432\u0440\u043E
         </span>
         <span class="ml-2">
-            ( = <span class="font-bold text-orange-400">${result.priceBGN.toFixed(2)} \u043B\u0432.</span> )
+            ( = <span class="font-bold text-orange-500 dark:text-orange-400"><span class="text-base">${result.priceBGN.toFixed(2)}</span> \u043B\u0432.</span> )
         </span>
     `;
       let changeLine = "";
       if (result.hasMixed) {
         changeLine = `
+            <span class="absolute inset-0 bg-gray-200 dark:bg-slate-600 rounded-md z-0 -mx-2 -my-1 animate-pulse"></span>
+            <span class="relative">
             \u0420\u0435\u0441\u0442\u043E: 
-            <span class="ml-2 font-bold text-blue-300">
-                ${result.mixedEur.toFixed(2)} \u0435\u0432\u0440\u043E
+            <span class="ml-2 font-bold text-sky-600 dark:text-blue-300">
+                <span class="text-base">${result.mixedEur.toFixed(2)}</span> \u0435\u0432\u0440\u043E
             </span>
             \u0438
-            <span class="ml-1 font-bold text-orange-400">
-                ${result.mixedBgn.toFixed(2)} \u043B\u0432.
+            <span class="ml-1 font-bold text-orange-500 dark:text-orange-400">
+                <span class="text-base">${result.mixedBgn.toFixed(2)}</span> \u043B\u0432.
             </span>
-            <span class="align-top text-red-500 font-bold">*</span>
+            </span>
         `;
       } else {
         changeLine = `
+            <span class="absolute inset-0 bg-gray-200 dark:bg-slate-600 rounded-md z-0 -mx-2 -my-1 animate-pulse"></span>
+            <span class="relative">
             \u0420\u0435\u0441\u0442\u043E: 
-            <span class="ml-2 font-bold text-blue-300">
-                ${Math.abs(result.totalChangeEUR).toFixed(2)} \u0435\u0432\u0440\u043E
+            <span class="ml-2 font-bold text-sky-600 dark:text-blue-300">
+                <span class="text-base">${Math.abs(result.totalChangeEUR).toFixed(2)}</span> \u0435\u0432\u0440\u043E
             </span>
             ( \u0438\u043B\u0438 
-            <span class="font-bold text-orange-400">
-                ${Math.abs(result.totalChangeBGN).toFixed(2)} \u043B\u0432.
+            <span class="font-bold text-orange-500 dark:text-orange-400">
+                <span class="text-base">${Math.abs(result.totalChangeBGN).toFixed(2)}</span> \u043B\u0432.
             </span>
             )
-            <span class="align-top text-red-500 font-bold">*</span>
+            </span>
         `;
       }
       results.innerHTML = `
@@ -461,13 +500,9 @@
             ${receivedLine}
         </div>
 
-        <div class="text-sm">
+        <div class="text-sm relative w-full">
             ${changeLine}
         </div>
-        <div class="text-xs mt-1 text-gray-300 tracking-widest font-bold">
-                    <span class="font-bold text-red-500">*</span>
-                    \u0417\u0430 \u0441\u043C\u0435\u0441\u0435\u043D\u043E \u0440\u0435\u0441\u0442\u043E \u0438\u0437\u043F\u043E\u043B\u0437\u0432\u0430\u0439\u0442\u0435 \u043F\u043E\u0441\u043B\u0435\u0434\u043D\u0438\u0442\u0435 \u0434\u0432\u0435 \u043F\u043E\u043B\u0435\u0442\u0430
-                   </div>
     `;
       return;
     }
@@ -475,31 +510,34 @@
     results.innerHTML = `
         <div class="text-sm">
             \u0426\u0435\u043D\u0430:
-            <span class="ml-2 mr-1 font-bold text-blue-300">
-                <span class="text-base text-shadow-lg">${result.priceEUR.toFixed(2)}</span> \u0435\u0432\u0440\u043E
+            <span class="ml-2 mr-1 font-bold text-sky-600 dark:text-blue-300">
+                <span class="text-base">${result.priceEUR.toFixed(2)}</span> \u0435\u0432\u0440\u043E
             </span>
             ( = 
-            <span class="ml-1 font-bold text-orange-400">
-                <span class="text-base text-shadow-lg">${result.priceBGN.toFixed(2)}</span> \u043B\u0432.
+            <span class="ml-1 font-bold text-orange-500 dark:text-orange-400">
+                <span class="text-base">${result.priceBGN.toFixed(2)}</span> \u043B\u0432.
             </span>
             )
         </div>
 
-        <div class="text-sm">
+        <div class="text-sm my-1">
             \u041F\u043B\u0430\u0442\u0435\u043D\u0438 \u0434\u043E \u043C\u043E\u043C\u0435\u043D\u0442\u0430:
-            <span class="ml-2 font-bold ${paidIsEUR ? "text-blue-300" : "text-orange-400"}">
-                <span class="text-base text-shadow-lg">${result.paidLabel}</span>
+            <span class="ml-2 font-bold ${paidIsEUR ? "text-sky-600 dark:text-blue-300" : "text-orange-500 dark:text-orange-400"}">
+                <span class="text-base">${result.paidLabel}</span>
             </span>
         </div>
 
-        <div class="text-sm">
+        <div class="relative text-sm">
+            <span class="absolute inset-0 bg-gray-200 dark:bg-slate-600 rounded-md z-0 -mx-2 -my-1 animate-pulse"></span>
+            <span class="relative">
             \u041E\u0441\u0442\u0430\u0432\u0430\u0442 \u0437\u0430 \u0434\u043E\u043F\u043B\u0430\u0449\u0430\u043D\u0435:
-            <span class="ml-2 mr-1 font-bold text-blue-300">
-                <span class="text-base text-shadow-lg">${result.remainingEUR.toFixed(2)}</span> \u0435\u0432\u0440\u043E
+            <span class="ml-2 mr-1 font-bold text-sky-600 dark:text-blue-300">
+                <span class="text-base">${result.remainingEUR.toFixed(2)}</span> \u0435\u0432\u0440\u043E
             </span>
             \u0438\u043B\u0438
-            <span class="ml-1 font-bold text-orange-400">
-                <span class="text-base text-shadow-lg">${result.remainingBGN.toFixed(2)}</span> \u043B\u0432.
+            <span class="ml-1 font-bold text-orange-500 dark:text-orange-400">
+                <span class="text-base">${result.remainingBGN.toFixed(2)}</span> \u043B\u0432.
+            </span>
             </span>
         </div>
     `;
@@ -828,6 +866,7 @@
         initAsideToggle();
         initResetButton();
         initKeypadInput();
+        initDisableNativeKeyboard();
         initURLLoader();
       });
     }
