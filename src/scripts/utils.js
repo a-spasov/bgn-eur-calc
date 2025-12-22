@@ -51,6 +51,7 @@ function initURLLoader() {
         validateInput(elements.priceBgn);
     }
 
+    document.dispatchEvent(new CustomEvent("show-notification"));
     const result = calculateChange();
     updateResultDisplay(result);
 }
