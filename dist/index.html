@@ -45,11 +45,11 @@
                                 class="absolute top-1 left-1 h-5 w-1/2 sm:w-[130px] rounded-sm bg-orange-600 transition-all duration-300 ease-out">
                             </div>
                             <button id="modePayment"
-                                class="relative z-10 text-sm font-bold w-1/2 sm:w-[130px] tracking-wider text-gray-800 dark:text-white">
+                                class="relative z-10 text-sm font-bold w-1/2 sm:w-[130px] tracking-wider text-gray-800 dark:text-white" aria-label="Режим плащане">
                                 Плащане
                             </button>
                             <button id="modeChange"
-                                class="relative z-10 text-sm font-bold w-1/2 sm:w-[130px] tracking-wider text-gray-800 dark:text-white">
+                                class="relative z-10 text-sm font-bold w-1/2 sm:w-[130px] tracking-wider text-gray-800 dark:text-white" aria-label="Режим ресто">
                                 Ресто
                             </button>
                         </div>
@@ -59,18 +59,21 @@
                     <div>
                         <!-- KEYPAD TOGGLE BUTTON -->
                         <button id="toggleNumpad"
+                            aria-label="Показване или скриване на цифрова клавиатура"
                             class="hidden xl:inline-block rounded-lg w-12 text-base font-bold px-3 py-0 mr-1 2xl:mr-2 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700">
                             <i class="fa-solid fa-keyboard"></i>
                         </button>
 
                         <!-- INFO MENU TOGGLE BUTTON -->
                         <button id="toggleAside"
+                            aria-label="Показване или скриване на информация и инструкции"
                             class="xl:hidden rounded-lg w-12 text-base font-bold px-3 py-0 mr-1 2xl:mr-2 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700">
                             <i class="fa-regular fa-circle-question"></i>
                         </button>
 
                         <!-- THEME SWITCH TOGGLE BUTTON -->
                         <button id="themeToggle"
+                            aria-label="Смяна на цветова тема"
                             class="rounded-lg w-12 text-base font-bold mr-1 2xl:mr-2 px-3  bg-gray-400 border-b-4 border-b-gray-500 active:translate-y-[4px] active:border-b-0 dark:bg-slate-400 dark:border-b-slate-500">
                             <span class="inline-block text-gray-200 dark:text-amber-300">
                                 <i class="fa-solid fa-lightbulb"></i>
@@ -79,6 +82,7 @@
 
                         <!-- RESET CALCULATOR -->
                         <button id="resetCalc"
+                            aria-label="Нулиране на всички полета на калкулатора"
                             class="rounded-lg w-12 text-base font-bold px-3 py-0 text-white bg-red-500 border-b-4 border-b-red-700 active:translate-y-[4px] active:border-b-0">
                             <i class="fa-solid fa-arrows-rotate"></i>
                         </button>
@@ -105,7 +109,7 @@
                     <!-- PRICE ROW -->
                     <div id="priceInputs" class="grid grid-cols-2 gap-6">
                         <div class="relative">
-                            <input id="priceEur" type="text" autocomplete="off" class="peer w-full p-3 bg-transparent text-gray-800 dark:text-white
+                            <input id="priceEur" type="text" autocomplete="off" aria-label="Цена в евро" class="peer w-full p-3 bg-transparent text-gray-800 dark:text-white
                                 border border-gray-500 rounded-md outline-none
                                 focus:border-orange-400 disabled:opacity-50 placeholder-transparent"
                                 placeholder="Цена в евро" inputmode="none">
@@ -119,7 +123,7 @@
                             <div class="absolute -right-5 top-1/2 -translate-y-1/2 opacity-80 text-2xl font-bold">=</div>
                         </div>
                         <div class="relative">
-                            <input id="priceBgn" type="text" autocomplete="off" class="peer w-full p-3 bg-transparent text-gray-800 dark:text-white
+                            <input id="priceBgn" type="text" autocomplete="off" aria-label="Цена в лева" class="peer w-full p-3 bg-transparent text-gray-800 dark:text-white
                                 border border-gray-500 rounded-md outline-none
                                 focus:border-orange-400 disabled:opacity-50 placeholder-transparent"
                                 placeholder="Цена в лева" inputmode="none">
@@ -136,7 +140,7 @@
                     <!-- PAYMENTS ROW -->
                     <div id="paymentInputs" class="grid grid-cols-2 gap-6">
                         <div class="relative">
-                            <input id="paidEur" type="text" autocomplete="off" class="peer w-full p-3 bg-transparent text-gray-800 dark:text-white
+                            <input id="paidEur" type="text" autocomplete="off" aria-label="Платено в евро" class="peer w-full p-3 bg-transparent text-gray-800 dark:text-white
                                 border border-gray-500 rounded-md outline-none
                                 focus:border-orange-400 disabled:opacity-50 placeholder-transparent"
                                 placeholder="Платено в евро" inputmode="none">
@@ -149,7 +153,7 @@
                             </label>
                         </div>
                         <div class="relative">
-                            <input id="paidBgn" type="text" autocomplete="off" class="peer w-full p-3 bg-transparent text-gray-800 dark:text-white
+                            <input id="paidBgn" type="text" autocomplete="off" aria-label="Платено в лева" class="peer w-full p-3 bg-transparent text-gray-800 dark:text-white
                                 border border-gray-500 rounded-md outline-none
                                 focus:border-orange-400 disabled:opacity-50 placeholder-transparent"
                                 placeholder="Платено в лева" inputmode="none">
@@ -171,13 +175,13 @@
                         </p>
                         <div class="grid grid-cols-2 gap-6">
                             <div class="relative">
-                                <input id="changeEur" type="text" autocomplete="off" class="peer w-full p-3 bg-transparent text-gray-800 dark:text-white border border-gray-500 rounded-md outline-none focus:border-orange-400 disabled:opacity-50 placeholder-transparent" placeholder="Ресто в евро" inputmode="none">
+                                <input id="changeEur" type="text" autocomplete="off" aria-label="Ресто в евро" class="peer w-full p-3 bg-transparent text-gray-800 dark:text-white border border-gray-500 rounded-md outline-none focus:border-orange-400 disabled:opacity-50 placeholder-transparent" placeholder="Ресто в евро" inputmode="none">
                                 <label for="changeEur" class="absolute left-3 -top-2.5 px-1 bg-gray-200 dark:bg-slate-700 text-sm text-gray-700 dark:text-gray-300 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-focus:-top-2.5 peer-focus:text-sm">
                                     Ресто в евро
                                 </label>
                             </div>
                             <div class="relative">
-                                <input id="changeBgn" type="text" autocomplete="off" class="peer w-full p-3 bg-transparent text-gray-800 dark:text-white border border-gray-500 rounded-md outline-none focus:border-orange-400 disabled:opacity-50 placeholder-transparent" placeholder="Ресто в лева" inputmode="none">
+                                <input id="changeBgn" type="text" autocomplete="off" aria-label="Ресто в лева" class="peer w-full p-3 bg-transparent text-gray-800 dark:text-white border border-gray-500 rounded-md outline-none focus:border-orange-400 disabled:opacity-50 placeholder-transparent" placeholder="Ресто в лева" inputmode="none">
                                 <label for="changeBgn" class="absolute left-3 -top-2.5 px-1 bg-gray-200 dark:bg-slate-700 text-sm text-gray-700 dark:text-gray-300 transition-all peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-focus:-top-2.5 peer-focus:text-sm">
                                     Ресто в лева
                                 </label>
@@ -191,46 +195,47 @@
                     class="relative grid grid-cols-4 grid-rows-4 gap-4 h-80 2xl:h-96 text-lg font-bold mt-auto transform transition-all duration-500 ease-in-expo visible opacity-100 xl:invisible xl:opacity-0">
                     <!-- ROW 1 -->
                     <button
-                        class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700">7</button>
+                        class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700" aria-label="Цифра 7">7</button>
                     <button
-                        class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700">8</button>
+                        class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700" aria-label="Цифра 8">8</button>
                     <button
-                        class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700">9</button>
+                        class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700" aria-label="Цифра 9">9</button>
                     <button
-                        class="row-span-2 rounded-xl text-2xl font-bold leading-none px-4 py-3 text-white bg-orange-500 border-b-4 border-b-orange-700 active:translate-y-[2px] active:border-b-0">
+                        class="row-span-2 rounded-xl text-2xl font-bold leading-none px-4 py-3 text-white bg-orange-500 border-b-4 border-b-orange-700 active:translate-y-[2px] active:border-b-0" aria-label="Изтрий последно въведената цифра">
                         <i class="fa-solid fa-trash"></i>
                     </button>
                     <!-- ROW 2 -->
                     <button
-                        class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700">4</button>
+                        class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700" aria-label="Цифра 4">4</button>
                     <button
-                        class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700">5</button>
+                        class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700" aria-label="Цифра 5">5</button>
                     <button
-                        class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700">6</button>
+                        class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700" aria-label="Цифра 6">6</button>
                     <!-- ROW 3 -->
                     <button
-                        class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700">1</button>
+                        class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700" aria-label="Цифра 1">1</button>
                     <button
-                        class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700">2</button>
+                        class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700" aria-label="Цифра 2">2</button>
                     <button
-                        class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700">3</button>
+                        class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700" aria-label="Цифра 3">3</button>
                     <button
-                        class="row-span-2 rounded-xl text-2xl font-bold leading-none px-4 py-3 text-white bg-red-500 border-b-4 border-b-red-700 active:translate-y-[2px] active:border-b-0">
+                        class="row-span-2 rounded-xl text-2xl font-bold leading-none px-4 py-3 text-white bg-red-500 border-b-4 border-b-red-700 active:translate-y-[2px] active:border-b-0" aria-label="Изчисти всички въведени стойности">
                         <i class="fa-solid fa-rotate-left"></i>
                     </button>
                     <!-- ROW 4 -->
                     <button
-                        class="col-span-2 rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700">
+                        class="col-span-2 rounded-xl text-2xl font-bold leading-[0] px-4 py-3 bg-stone-300 text-gray-800 border-b-4 border-b-stone-400 active:translate-y-[2px] active:border-b-0 dark:bg-stone-200 dark:text-gray-700" aria-label="Цифра 0">
                         0 </button>
                     <button
-                        class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 text-gray-200 bg-gray-400 border-b-4 border-b-gray-500 active:translate-y-[4px] active:border-b-0 dark:bg-slate-400 dark:border-b-slate-500 dark:text-white">.</button>
+                        class="rounded-xl text-2xl font-bold leading-[0] px-4 py-3 text-gray-200 bg-gray-400 border-b-4 border-b-gray-500 active:translate-y-[4px] active:border-b-0 dark:bg-slate-400 dark:border-b-slate-500 dark:text-white"
+                        aria-label="Десетична точка">.</button>
                 </div>
             </div>
         </main>
         <!-- ASIDE MENU -->
         <aside id="infoAside" class="fixed xl:static top-0 right-0 xl:shadow-none w-full sm:w-5/6 xl:w-1/3 min-h-screen h-full bg-gray-300 dark:bg-slate-800 pl-6 pr-16 py-12 xl:pr-6 flex flex-col overflow-y-auto transform translate-x-full xl:translate-x-0 transition-transform duration-500 ease-in-out z-50 shadow-2xl xl:shadow-none">
             <section class="relative inline-flex flex-col justify-center gap-15">
-                <button id="closeAside" class="xl:hidden fixed top-6 right-6 rounded-md size-8 flex items-center justify-center text-white bg-red-500 border-b-4 border-b-red-700 active:translate-y-[4px] active:border-b-0">
+                <button id="closeAside" aria-label="Затваряне на панела с информация и инструкции" class="xl:hidden fixed top-6 right-6 rounded-md size-8 flex items-center justify-center text-white bg-red-500 border-b-4 border-b-red-700 active:translate-y-[4px] active:border-b-0">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
                 <article>
