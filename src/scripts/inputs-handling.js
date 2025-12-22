@@ -6,6 +6,14 @@ function autoConvert(fieldId, rawValue) {
     const value = parseFloat(rawValue);
     if (isNaN(value)) return;
 
+    if (
+    (fieldId === "priceEur" || fieldId === "priceBgn") &&
+    !elements.priceEur.value &&
+    !elements.priceBgn.value
+) {
+    return;
+}
+
     const { priceEur, priceBgn } = elements;
 
     switch (fieldId) {
@@ -147,6 +155,7 @@ function validateInput(input) {
             store.validation.priceEur = false;
         }
 
+        document.dispatchEvent(new CustomEvent("show-notification"));
         if (fieldId === "changeEur" || fieldId === "changeBgn") {
             return "empty";
         }

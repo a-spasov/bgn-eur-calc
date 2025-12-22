@@ -344,6 +344,19 @@ function initResetButton() {
     });
 }
 
+function resetPriceGroupState() {
+    elements.priceEur.value = "";
+    elements.priceBgn.value = "";
+
+    store.inputs.priceEur = "";
+    store.inputs.priceBgn = "";
+
+    store.validation.priceEur = false;
+    store.validation.priceBgn = false;
+
+    document.dispatchEvent(new CustomEvent("show-notification"));
+}
+
 function initKeypadInput() {
     const { numpad } = elements;
 
@@ -372,11 +385,16 @@ function initKeypadInput() {
 
         store.inputs[input.id] = input.value;
 
+        if (
+            (input.id === "priceEur" || input.id === "priceBgn") &&
+            input.value === ""
+        ) {
+            resetPriceGroupState();
+            return;
+        }
+
         const valid = validateInput(input);
 
-        document.dispatchEvent(new CustomEvent("show-notification", {
-            detail: { type: valid ? "success" : "error", fieldId: input.id }
-        }));
         input.dispatchEvent(new Event("input", { bubbles: true }));
     });
 }
