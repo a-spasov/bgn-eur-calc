@@ -392,6 +392,15 @@
       }
     });
   }
+  function resetPriceGroupState() {
+    elements.priceEur.value = "";
+    elements.priceBgn.value = "";
+    store.inputs.priceEur = "";
+    store.inputs.priceBgn = "";
+    store.validation.priceEur = false;
+    store.validation.priceBgn = false;
+    document.dispatchEvent(new CustomEvent("show-notification"));
+  }
   function initKeypadInput() {
     const { numpad } = elements;
     if (!numpad) return;
@@ -410,10 +419,11 @@
       }
       input.focus();
       store.inputs[input.id] = input.value;
+      if ((input.id === "priceEur" || input.id === "priceBgn") && input.value === "") {
+        resetPriceGroupState();
+        return;
+      }
       const valid = validateInput(input);
-      document.dispatchEvent(new CustomEvent("show-notification", {
-        detail: { type: valid ? "success" : "error", fieldId: input.id }
-      }));
       input.dispatchEvent(new Event("input", { bubbles: true }));
     });
   }
@@ -562,6 +572,9 @@
   function autoConvert(fieldId, rawValue) {
     const value = parseFloat(rawValue);
     if (isNaN(value)) return;
+    if ((fieldId === "priceEur" || fieldId === "priceBgn") && !elements.priceEur.value && !elements.priceBgn.value) {
+      return;
+    }
     const { priceEur, priceBgn } = elements;
     switch (fieldId) {
       case "priceEur":
@@ -669,6 +682,7 @@
         store.inputs.priceEur = "";
         store.validation.priceEur = false;
       }
+      document.dispatchEvent(new CustomEvent("show-notification"));
       if (fieldId === "changeEur" || fieldId === "changeBgn") {
         return "empty";
       }
@@ -863,6 +877,7 @@
       elements.priceBgn.value = number.toFixed(2);
       validateInput(elements.priceBgn);
     }
+    document.dispatchEvent(new CustomEvent("show-notification"));
     const result = calculateChange();
     updateResultDisplay(result);
   }
