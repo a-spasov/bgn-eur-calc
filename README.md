@@ -65,15 +65,26 @@ Build output is generated in `dist/`:
 - `npm run build` – full production build
 
 ## URL Prefill
-You can prefill the calculator with price and open directly in change mode:
+You can prefill the calculator with a price and open directly in change mode.
 
-- `?price=12eur`
-- `?price=25bgn`
+Supported query format:
+- `?price=<amount><currency>`
+- `currency`: `eur` or `bgn` (case-insensitive)
+- `amount`: integer or decimal, using `.` or `,`
+- no spaces are allowed in the value
 
 Examples:
+- `?price=12eur`
+- `?price=25bgn`
+- `?price=45BGN`
+- `?price=25.62bgn`
+- `?price=25,62EUR`
 
-- `http://localhost:3000/?price=12eur`
-- `http://localhost:3000/?price=25bgn`
+Full URL examples:
+- `http://localhost:3000?price=12eur`
+- `http://localhost:3000?price=25,62eur`
+
+If the parameter is missing or invalid, the app loads normally in payment mode.
 
 ## Notes
 - UI texts/messages are currently in Bulgarian.
