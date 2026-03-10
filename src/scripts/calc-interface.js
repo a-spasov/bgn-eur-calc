@@ -229,6 +229,8 @@ function initKeypadToggle() {
 
         if (store.mode === "payment") {
             setTimeout(() => {
+                if (store.mode !== "payment" || !numpad.classList.contains("keyboard-on")) return;
+
                 const width = window.innerWidth;
 
                 if (width < 400) {
@@ -264,6 +266,8 @@ function initKeypadToggle() {
 
             if (isPaymentMode) {
                 setTimeout(() => {
+                    if (store.mode !== "payment" || !numpad.classList.contains("keyboard-on")) return;
+
                     const width = window.innerWidth;
 
                     if (width < 1536) {
